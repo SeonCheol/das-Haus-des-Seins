@@ -5,16 +5,15 @@ from time import ctime
 import wave
 import pyaudio
 
+import grungermonet as gm
+
 HOST = ''
 PORT = 5810
 BUF_SIZE = 1024
 ADDR = (HOST, PORT)
 NUM = 2
-
-CHUNK = 1024
-MIC_NUM = 1
-RATE = 44100
-FORMAT =pyaudio.paInt16
+FORMAT = pyaudio.paInt16
+RECORD_SECONDS = 10
 
 serverSock = socket(AF_INET, SOCK_STREAM)
 serverSock.bind(ADDR)
@@ -98,10 +97,10 @@ while connection_list:
                     connection_list.remove(sock)
                     num_client -= 1
 
-                    wf = wave.open('test.wav', 'wb')
+                    wf = wave.open('ki.wav', 'wb')
                     wf.setnchannels(1)
                     wf.setsampwidth(p.get_sample_size(FORMAT))
-                    wf.setframerate(RATE)
+                    wf.setframerate(44100)
                     wf.writeframes(b''.join(frames))
                     wf.close()
                     sock.close()

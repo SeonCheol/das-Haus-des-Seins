@@ -43,7 +43,7 @@ try:
 
 
 
-    wf = wave.open('test2.wav', 'wb')
+    wf = wave.open('ki2.wav', 'wb')
     wf.setnchannels(1)
     wf.setsampwidth(p.get_sample_size(FORMAT))
     wf.setframerate(RATE)
