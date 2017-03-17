@@ -293,7 +293,29 @@ class GrungerMonet:
                                 print("the connection is closed", connection_list, j)
                             break
                             sys.exit()
+                    ## after retrieve the datas
+                    delay = self.get_delay_time_gcc(data[0], data[1])
+                    # energy = af.stEnergy(data[0])
+                    # if self.idx%100 == 0:
+                    #     self.sum_energy = self.sum_energy + energy
+                    # mean_energy = round(self.sum_energy / (self.idx + 1), 4)
+                    # self.idx = self.idx + 1
+                    # self.idx = self.idx % 100
 
+                    # if mean_energy <= energy:
+                    #     self.isVoice = True
+                    # else:
+                    #     self.isVoice = False
+
+                    ### calculate the sound  source ###
+                    location = self.cal_location(delay)
+                    # if self.isVoice == True:
+                    #     plt.plot(location, 0.5, 'ro')
+                    #     plt.draw(), plt.pause(0.0001)
+                    #     plt.clf()
+                    # else:
+                    #     plt.clf()
+                    print(location)
             except KeyboardInterrupt:
                 serverSock.close()
                 sys.exit()
