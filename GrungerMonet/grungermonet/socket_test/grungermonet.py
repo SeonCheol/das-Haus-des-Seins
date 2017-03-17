@@ -257,7 +257,7 @@ class GrungerMonet:
                 # requested with select , and unblock every 10 seconds
                 read_sock, write_sock, err_sock = select(connection_list, [], [], 10)
                 # print read_sock, write_sock, err_sock
-                print( num_client, len(connection_list), read_sock)
+                # print( num_client, len(connection_list), read_sock)
 
                 if num_client < 2 :
                     for sock in read_sock:
@@ -274,8 +274,13 @@ class GrungerMonet:
                         data[i] = connection_list[i+1].recv(BUF_SIZE)
 
                         if data[i]:
-                            frames[i].append(data[i])
-                            data[i] = np.fromstring(data[i])
+                            try:
+                                frames[i].append(data[i])
+                                print(len(data[i]), i)
+                                data[i] = np.fromstring(data[i])
+                                print(data[i])
+                            except ValueError as e:
+                                print(e.message)
                         else:
                             print "exit and save"
                             for j in range(2):
@@ -294,6 +299,8 @@ class GrungerMonet:
                             break
                             sys.exit()
                     ## after retrieve the datas
+                    if len(data[0]) != len(data[1]):
+                        continue
                     delay = self.get_delay_time_gcc(data[0], data[1])
                     # energy = af.stEnergy(data[0])
                     # if self.idx%100 == 0:
@@ -324,7 +331,7 @@ class GrungerMonet:
 
     def client_play(self):
         ## socket info
-        HOST = '127.0.0.1'
+        HOST = '39.115.18.195'
         PORT = 5810
         BUFF_SIZE = 1024
         ADDR = (HOST, PORT)
