@@ -16,7 +16,7 @@ class GrungerMonet:
     MIC_NUM = 2
     RATE = 44100
     FORMAT =pyaudio.paInt16
-    RECORD_SECONDS = 40
+    RECORD_SECONDS = 8
 
 
     ## installed mic array's coordinate
@@ -222,7 +222,6 @@ class GrungerMonet:
         # print meter_per_dot, diff_from_cent, loc
         return round(loc, 5)
 
-
     ## get sound speed
     def sound_speed(self, temperature=15):
         tmp = (273 + temperature) / 288
@@ -237,6 +236,7 @@ class GrungerMonet:
         BUF_SIZE = 1024
         ADDR = (HOST, PORT)
         NUM = 2
+
 
         serverSock = socket(AF_INET, SOCK_STREAM)
         serverSock.bind(ADDR)
@@ -254,70 +254,46 @@ class GrungerMonet:
         while connection_list:
             try:
                 print('wait...')
-
                 # requested with select , and unblock every 10 seconds
                 read_sock, write_sock, err_sock = select(connection_list, [], [], 10)
                 # print read_sock, write_sock, err_sock
-                print connection_list
-                print read_sock
-                for i in range(len(read_sock)):
-                    ## new connection ##
-                    if read_sock[i] == serverSock:
-                        clientSock, addr_info = serverSock.accept()
-                        connection_list.append(clientSock)
-                        # print(connection_list)
-                        num_client += 1
-                        if num_client == 2:
-                            for tmp_sock in connection_list[1:]:
-                                tmp_sock.send('s')
+                print( num_client, len(connection_list), read_sock)
 
-                        # print("[%s] client(%s) is connecting" % (ctime(), addr_info[0]))
-                        ## reply to client ##
-                        for socket_in_list in connection_list:
-                            if socket_in_list != serverSock and socket_in_list != read_sock[i]:
-                                try:
-                                    print("new connection")
-                                except Exception as e:
-                                    socket_in_list.close()
-                                    connection_list.remove(socket_in_list)
-                                    num_client -= 1
-                                    sys.exit()
+                if num_client < 2 :
+                    for sock in read_sock:
+                        if sock == serverSock:
+                            clientSock, addr_info = serverSock.accept()
+                            connection_list.append(clientSock)
+                            num_client += 1
 
-                    ## client who are connecting send new data
-                    else:
-                        if num_client == 2:
-                            data[i] = read_sock[i].recv(BUF_SIZE)
-                            read_sock[i].send('f')
-                        else:
-                            data[i] = None
+                            if num_client == 2:
+                                for tmp_sock in connection_list[1:]:
+                                    tmp_sock.send('s')
+                elif num_client == 2:
+                    for i in range(2):
+                        data[i] = connection_list[i+1].recv(BUF_SIZE)
 
                         if data[i]:
-                            # print("[%s]data is given %s" % (ctime(), data))
                             frames[i].append(data[i])
                             data[i] = np.fromstring(data[i])
-                            # for socket_in_list in connection_list:
-                            #     if socket_in_list != serverSock and socket_in_list != read_sock[i]:
-                            #         try:
-                            #             # print i, data[i]
-                            #         except Exception as e:
-                            #             print(e.message)
-                            #             socket_in_list.close()
-                            #             connection_list.remove(socket_in_list)
-                            #             num_client -= 1
-                            #             continue
                         else:
                             print "exit and save"
-                            connection_list.remove(read_sock[i])
-                            num_client -= 1
-                            filename = 'test' + str(i) + '.wav'
-                            wf = wave.open(filename, 'wb')
-                            wf.setnchannels(1)
-                            wf.setsampwidth(p.get_sample_size(self.FORMAT))
-                            wf.setframerate(self.RATE)
-                            wf.writeframes(b''.join(frames[i]))
-                            wf.close()
-                            read_sock[i].close()
-                            print("the connection is closed")
+                            for j in range(2):
+                                # connection_list.remove(read_sock[j])
+                                num_client  = 0
+                                filename = 'test' + str(j) + '.wav'
+                                wf = wave.open(filename, 'wb')
+                                wf.setnchannels(1)
+                                wf.setsampwidth(p.get_sample_size(self.FORMAT))
+                                wf.setframerate(self.RATE)
+                                wf.writeframes(b''.join(frames[j]))
+                                wf.close()
+                                connection_list[1].close()
+                                connection_list.remove(connection_list[1])
+                                print("the connection is closed", connection_list, j)
+                            break
+                            sys.exit()
+
             except KeyboardInterrupt:
                 serverSock.close()
                 sys.exit()
