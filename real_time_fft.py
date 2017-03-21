@@ -8,9 +8,9 @@ import matplotlib.animation as anim
 
 CHUNK = 1024
 FORMAT = pyaudio.paInt16
-CHANNELS = 2
+CHANNELS = 1
 RATE = 44100
-RECORD_SECONDS = 8
+RECORD_SECONDS = 15
 WAVE_OUTPUT_FILENAME = "sound/test.wav"
 
 p = pyaudio.PyAudio()
@@ -40,6 +40,7 @@ for i in range(0, n):
     delay_time = abs((max_idx+1) - k/2) /RATE
     #
     # plt.plot(t, gcc_result[1:])
+    # plt.plot(data)
     # plt.draw(), plt.pause(0.00001)
     # plt.clf()
     print(t[max_idx], max_idx, k , len(data))
@@ -53,5 +54,6 @@ wf.setnchannels(CHANNELS)
 wf.setsampwidth(p.get_sample_size(FORMAT))
 wf.setframerate(RATE)
 wf.writeframes(b''.join(frames))
+print(wf)
 
 wf.close()

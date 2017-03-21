@@ -5,4 +5,4 @@ if '__main__' == __name__:
     print grunger.dist_per_index
     print grunger.sound_speed
 
-    grunger.an_test_play()
+    grunger.play()

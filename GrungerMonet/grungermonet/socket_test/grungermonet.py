@@ -208,9 +208,10 @@ class GrungerMonet:
         # t = np.arange(-k / fs / 2, k / fs / 2, 1.0 / fs)
 
         # print "max idx ", max_idx
+
         delay_time = max_idx - (k/2)
         delay_time = delay_time * self.dist_per_index
-
+        print max_idx, delay_time
         return delay_time
 
     def cal_location(self, delay_time):
@@ -253,7 +254,7 @@ class GrungerMonet:
         data = [None, None]
         while connection_list:
             try:
-                print('wait...')
+                print('wait...', num_client)
                 # requested with select , and unblock every 10 seconds
                 read_sock, write_sock, err_sock = select(connection_list, [], [], 10)
                 # print read_sock, write_sock, err_sock
@@ -276,9 +277,7 @@ class GrungerMonet:
                         if data[i]:
                             try:
                                 frames[i].append(data[i])
-                                print(len(data[i]), i)
                                 data[i] = np.fromstring(data[i])
-                                print(data[i])
                             except ValueError as e:
                                 print(e.message)
                         else:
@@ -296,7 +295,6 @@ class GrungerMonet:
                                 connection_list[1].close()
                                 connection_list.remove(connection_list[1])
                                 print("the connection is closed", connection_list, j)
-                            break
                             sys.exit()
                     ## after retrieve the datas
                     if len(data[0]) != len(data[1]):
@@ -331,7 +329,7 @@ class GrungerMonet:
 
     def client_play(self):
         ## socket info
-        HOST = '39.115.18.195'
+        HOST = '192.168.35.30'
         PORT = 5810
         BUFF_SIZE = 1024
         ADDR = (HOST, PORT)
