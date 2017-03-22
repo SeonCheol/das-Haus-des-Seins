@@ -6,14 +6,15 @@ from scipy.io import wavfile
 import matplotlib.pyplot as plt
 from pyAudioAnalysis import audioFeatureExtraction as af
 import scipy.fftpack as sf
-import statistics as stat
 
 class GrungerMonet:
     CHUNK = 1024
     MIC_NUM = 2
     RATE = 44100
     FORMAT =pyaudio.paInt16
-    RECORD_SECONDS = 10
+    RECORD_SECONDS = 20
+
+    idx2 = 0
 
     ## installed mic array's coordinate
     mic_x = []
@@ -236,7 +237,6 @@ class GrungerMonet:
         # Convert cutoff frequencies into points on spectrum
         [Low_point, High_point] = map(lambda F: F / F_sample * M, [Low_cutoff, High_cutoff])
         return np.var(Spectrum[int(Low_point):int(High_point)])
-
     def play(self):
         p = pyaudio.PyAudio()
         stream = p.open(format=self.FORMAT, channels=self.MIC_NUM,
@@ -244,7 +244,6 @@ class GrungerMonet:
         n = int((self.RATE / self.CHUNK) * self.RECORD_SECONDS)
         frames = []
         mean_energy = 0
-
         for i in range(0, n):
             data = stream.read(self.CHUNK)
             frames.append(data)
@@ -255,30 +254,34 @@ class GrungerMonet:
             print("energy " ,energy)
             if ( (self.idx%100) == 0):
                 self.sum_energy = mean_energy
-
             self.sum_energy = self.sum_energy + energy
-
             mean_energy = round(self.sum_energy / (self.idx + 1), 4)
-
             self.idx = self.idx + 1
             self.idx = self.idx % 100
-
             if mean_energy <= energy:
                 self.isVoice = True
             else:
                 self.isVoice = False
-
             fft_data1 = np.fft.fft(data)
             fft_data2 = np.fft.fft(data2)
             feature = self.getFeature(fft_data1)
-            print feature
+            self.saveFile(feature)
+            print feature, self.idx2
 
     def getFeature(self, fft_data):
         maxFrq, maxFreqIdx = self.maxFrequencyForFFT(fft_data, self.RATE)
         max_idx = np.argmax(fft_data)
         decibel = self.decibel(fft_data[maxFreqIdx][0], max_idx)
         softness = self.deviation(fft_data, self.RATE)
-        return maxFrq, decibel, softness
+        return maxFrq[0], decibel, softness
 
-
-    def socketToProcessing(self):
+    def saveFile(self, toSaveData):
+        #fileName = "dataForsoundInfo" + str(self.idx2) + ".txt"
+        fileName="data/dataForsoundInfo0.txt";
+        file = open(fileName, 'w+')
+        for i in range(3):
+            file.write(str(toSaveData[i]) + " ")
+        file.write(str(self.idx2))
+        self.idx2 += 1
+        self.idx2 = int(self.idx2 % 1000000)
+        file.close()
