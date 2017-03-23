@@ -6,6 +6,10 @@ from scipy.io import wavfile
 import matplotlib.pyplot as plt
 from pyAudioAnalysis import audioFeatureExtraction as af
 import scipy.fftpack as sf
+from socket import *
+from select import *
+import wave
+import sys
 
 class GrungerMonet:
     CHUNK = 1024
@@ -273,7 +277,7 @@ class GrungerMonet:
         max_idx = np.argmax(fft_data)
         decibel = self.decibel(fft_data[maxFreqIdx][0], max_idx)
         softness = self.deviation(fft_data, self.RATE)
-        return maxFrq[0], decibel, softness
+        return np.array([maxFrq[0], decibel, softness])
 
     def saveFile(self, toSaveData):
         #fileName = "dataForsoundInfo" + str(self.idx2) + ".txt"
@@ -285,3 +289,151 @@ class GrungerMonet:
         self.idx2 += 1
         self.idx2 = int(self.idx2 % 1000000)
         file.close()
+
+    def server(self):
+        HOST = ''
+        PORT = 5810
+        BUF_SIZE = 1024
+        ADDR = (HOST, PORT)
+        NUM = 2
+
+        serverSock = socket(AF_INET, SOCK_STREAM)
+        serverSock.bind(ADDR)
+        serverSock.listen(10)
+        connection_list = [serverSock]
+        print "start. wait connecting to %s port" % str(PORT)
+        frames = [[], []]
+        p = pyaudio.PyAudio()
+
+        ## start flag
+        start = False
+
+        num_client = 0
+        data = [None, None]
+        while connection_list:
+            try:
+                print('wait...', num_client)
+                # requested with select , and unblock every 10 seconds
+                read_sock, write_sock, err_sock = select(connection_list, [], [], 10)
+                # print read_sock, write_sock, err_sock
+                # print( num_client, len(connection_list), read_sock)
+
+                if num_client < 2:
+                    for sock in read_sock:
+                        if sock == serverSock:
+                            clientSock, addr_info = serverSock.accept()
+                            connection_list.append(clientSock)
+                            num_client += 1
+
+                            if num_client == 2:
+                                for tmp_sock in connection_list[1:]:
+                                    tmp_sock.send('s')
+                elif num_client == 2:
+                    strToSave = ""
+                    for i in range(2):
+                        data[i] = connection_list[i + 1].recv(1000)
+                        if data[i]:
+                            data[i] = np.fromstring(data[i])
+                            print data[i]
+
+                            try:
+                                strToSave  += str(i) + " "
+                                for j in range(len(data[i])):
+                                    strToSave += str(data[i][j]) + " "
+
+                            except ValueError as e:
+                                print(e.message)
+                        else:
+                            # print "exit and save"
+                            # for j in range(2):
+                            #     # connection_list.remove(read_sock[j])
+                            #     num_client = 0
+                            #     filename = 'test' + str(j) + '.wav'
+                            #     wf = wave.open(filename, 'wb')
+                            #     wf.setnchannels(1)
+                            #     wf.setsampwidth(p.get_sample_size(self.FORMAT))
+                            #     wf.setframerate(self.RATE)
+                            #     wf.writeframes(b''.join(frames[j]))
+                            #     wf.close()
+                            #     connection_list[1].close()
+                            #     connection_list.remove(connection_list[1])
+                            #     print("the connection is closed", connection_list, j)
+                            sys.exit()
+                    ## after retrieve the datas
+                    file = open("data/dataForSound.data", "w+")
+                    file.write(strToSave)
+                    file.close()
+
+
+            except KeyboardInterrupt:
+                serverSock.close()
+                sys.exit()
+
+
+
+    def client(self):
+        ## socket info
+        HOST = '127.0.0.1'
+        PORT = 5810
+        BUFF_SIZE = 1024
+        ADDR = (HOST, PORT)
+
+        ## record info
+        # CHUNK = 1024
+        # MIC_NUM = 1
+        # RATE = 44100
+        # FORMAT = pyaudio.paInt16
+        # RECORD_SECONDS = 1000
+
+        clientSock = socket(AF_INET, SOCK_STREAM)
+
+        p = pyaudio.PyAudio()
+        stream = p.open(format=self.FORMAT, channels=1,
+                        rate=self.RATE, input=True, frames_per_buffer=self.CHUNK)
+        n = int((self.RATE / self.CHUNK) * self.RECORD_SECONDS)
+        frames = []
+        try:
+            clientSock.connect(ADDR)
+
+            print("wait...")
+            clientSock.recv(22)
+
+            print("Recording....")
+            mean_energy = 0
+            for i in range(0, n):
+                data = stream.read(self.CHUNK)
+                print(i)
+                frames.append(data)
+                # clientSock.send(data)
+                data = np.fromstring(data, dtype='int16')
+
+                energy = af.stEnergy(data)
+                print("energy ", energy)
+                if ((self.idx % 100) == 0):
+                    self.sum_energy = mean_energy
+                self.sum_energy = self.sum_energy + energy
+                mean_energy = round(self.sum_energy / (self.idx + 1), 4)
+                self.idx = self.idx + 1
+                self.idx = self.idx % 100
+                if mean_energy <= energy:
+                    self.isVoice = True
+                else:
+                    self.isVoice = False
+                fft_data1 = np.fft.fft(data)
+                feature = self.getFeature(fft_data1)
+                print "???" , feature
+                clientSock.send(feature.tostring())
+
+
+            wf = wave.open('test.wav', 'wb')
+            wf.setnchannels(1)
+            wf.setsampwidth(p.get_sample_size(self.FORMAT))
+            wf.setframerate(self.RATE)
+            wf.writeframes(b''.join(frames))
+            wf.close()
+
+        except Exception as e:
+            print(e.message)
+            sys.exit()
+
+        print("connect")
