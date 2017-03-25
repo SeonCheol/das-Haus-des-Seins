@@ -17,33 +17,14 @@
       <content type="file-editors">
         <state>
           <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file leaf-file-name="fftConvert.py" pinned="false" current-in-tab="false">
+            <file leaf-file-name="fftConvert.py" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/fftConvert.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="860">
-                    <caret line="47" column="37" lean-forward="false" selection-start-line="47" selection-start-column="37" selection-end-line="47" selection-end-column="37" />
+                  <state relative-caret-position="580">
+                    <caret line="39" column="0" lean-forward="true" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
                     <folding>
                       <element signature="e#0#11#0" expanded="true" />
                       <marker date="1490078444202" expanded="true" signature="1913:1917" ph="..." />
-                    </folding>
-                  </state>
-                </provider>
-              </entry>
-            </file>
-            <file leaf-file-name="grungermonet.py" pinned="false" current-in-tab="true">
-              <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/grungermonet.py">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="468">
-                    <caret line="331" column="34" lean-forward="true" selection-start-line="331" selection-start-column="34" selection-end-line="331" selection-end-column="34" />
-                    <folding>
-                      <element signature="e#0#18#0" expanded="true" />
-                      <element signature="e#1065#1605#0" expanded="false" />
-                      <element signature="e#1680#2516#0" expanded="false" />
-                      <element signature="e#2589#4957#0" expanded="false" />
-                      <element signature="e#5006#5236#0" expanded="false" />
-                      <element signature="e#5528#6609#0" expanded="false" />
-                      <element signature="e#6704#8104#0" expanded="false" />
-                      <element signature="e#8361#8690#0" expanded="false" />
                     </folding>
                   </state>
                 </provider>
@@ -80,12 +61,32 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dataForSound.data" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dataForSound.data" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/data/dataForSound.data">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
-              <caret line="0" column="15" lean-forward="false" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
+              <caret line="0" column="52" lean-forward="false" selection-start-line="0" selection-start-column="52" selection-end-line="0" selection-end-column="52" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="grungermonet.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/grungermonet.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="657">
+              <caret line="276" column="37" lean-forward="true" selection-start-line="276" selection-start-column="37" selection-end-line="276" selection-end-column="37" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#1066#1606#0" expanded="false" />
+                <element signature="e#1681#2517#0" expanded="false" />
+                <element signature="e#2590#4958#0" expanded="false" />
+                <element signature="e#5007#5237#0" expanded="false" />
+                <element signature="e#5529#6610#0" expanded="false" />
+                <element signature="e#8362#8691#0" expanded="false" />
+                <element signature="e#8720#9875#0" expanded="false" />
+                <element signature="e#13899#13944#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -93,8 +94,8 @@
       <file leaf-file-name="grungermonet.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/socket_test/grungermonet.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+            <state relative-caret-position="6880">
+              <caret line="355" column="0" lean-forward="false" selection-start-line="355" selection-start-column="0" selection-end-line="355" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -113,7 +114,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>mtfile</find>
       <find>readaudiofile</find>
       <find>spect</find>
       <find>stsp</find>
@@ -141,8 +141,9 @@
       <find>fft</find>
       <find>print</find>
       <find>array</find>
-      <find>host</find>
       <find>getfeature</find>
+      <find>record</find>
+      <find>host</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -192,19 +193,20 @@
         <option value="$PROJECT_DIR$/GrungerMonet/grungermonet/socket_test/test.java" />
         <option value="$PROJECT_DIR$/real_time_fft.py" />
         <option value="$PROJECT_DIR$/wav_manipulate.py" />
-        <option value="$PROJECT_DIR$/GrungerMonet/grungermonet/socket_test/grungermonet.py" />
         <option value="$PROJECT_DIR$/fftConvert.py" />
         <option value="$PROJECT_DIR$/src/pygametest.py" />
         <option value="$PROJECT_DIR$/GrungerMonet/grungermonet/test.py" />
         <option value="$PROJECT_DIR$/GrungerMonet/grungermonet/client_test.py" />
+        <option value="$PROJECT_DIR$/GrungerMonet/grungermonet/data/dataForSound.data" />
+        <option value="$PROJECT_DIR$/GrungerMonet/grungermonet/socket_test/grungermonet.py" />
         <option value="$PROJECT_DIR$/GrungerMonet/grungermonet/grungermonet.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="952" />
-    <option name="width" value="976" />
-    <option name="height" value="1038" />
+    <option name="x" value="2391" />
+    <option name="width" value="1218" />
+    <option name="height" value="1309" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
@@ -262,15 +264,15 @@
     <property name="full.screen.before.presentation.mode" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\seoncheol\Documents\python\python_for_sound\GrungerMonet\grungermonet\socket_test" />
-      <recent name="C:\Users\seoncheol\Documents\python\python_for_sound\GrungerMonet\grungermonet" />
-      <recent name="C:\Users\seoncheol\Documents\python\python_for_sound\think_dsp\ThinkDSP-master\ThinkDSP-master\code" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\seoncheol\Documents\python\python_for_sound\src" />
       <recent name="C:\Users\seoncheol\Documents\python\python_for_sound\src\image.jpg" />
       <recent name="C:\Users\seoncheol\Documents\python\python_for_sound" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\seoncheol\Documents\python\python_for_sound\GrungerMonet\grungermonet\socket_test" />
+      <recent name="C:\Users\seoncheol\Documents\python\python_for_sound\GrungerMonet\grungermonet" />
+      <recent name="C:\Users\seoncheol\Documents\python\python_for_sound\think_dsp\ThinkDSP-master\ThinkDSP-master\code" />
     </key>
   </component>
   <component name="RunManager" selected="Python.test">
@@ -533,7 +535,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="952" y="0" width="976" height="1038" extended-state="1" />
+    <frame x="2391" y="0" width="1218" height="1309" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2829582" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -541,18 +543,18 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5124525" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3768279" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25652173" sideWeight="0.4875475" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24850555" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3268206" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39590445" sideWeight="0.497006" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.20260869" sideWeight="0.4875475" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39590445" sideWeight="0.497006" order="3" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32865497" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -595,11 +597,16 @@
           <line>107</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/GrungerMonet/grungermonet/grungermonet.py</url>
+          <line>381</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="18" />
+      <option name="time" value="19" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -660,6 +667,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="364">
           <caret line="455" column="4" lean-forward="false" selection-start-line="455" selection-start-column="4" selection-end-line="455" selection-end-column="4" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -839,17 +847,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/fftConvert.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="860">
-          <caret line="47" column="37" lean-forward="false" selection-start-line="47" selection-start-column="37" selection-end-line="47" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-            <marker date="1490078444202" expanded="true" signature="1913:1917" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Python27/Lib/site-packages/numpy/core/arrayprint.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="474">
@@ -871,11 +868,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/socket_test/grungermonet.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6880">
+          <caret line="355" column="0" lean-forward="false" selection-start-line="355" selection-start-column="0" selection-end-line="355" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
           <caret line="4" column="20" lean-forward="false" selection-start-line="4" selection-start-column="20" selection-end-line="4" selection-end-column="20" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/fftConvert.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="580">
+          <caret line="39" column="0" lean-forward="true" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+            <marker date="1490078444202" expanded="true" signature="1913:1917" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -887,37 +905,28 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/socket_test/grungermonet.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/data/dataForSound.data">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="0" column="15" lean-forward="false" selection-start-line="0" selection-start-column="15" selection-end-line="0" selection-end-column="15" />
+          <caret line="0" column="52" lean-forward="false" selection-start-line="0" selection-start-column="52" selection-end-line="0" selection-end-column="52" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GrungerMonet/grungermonet/grungermonet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="331" column="34" lean-forward="true" selection-start-line="331" selection-start-column="34" selection-end-line="331" selection-end-column="34" />
+        <state relative-caret-position="657">
+          <caret line="276" column="37" lean-forward="true" selection-start-line="276" selection-start-column="37" selection-end-line="276" selection-end-column="37" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1065#1605#0" expanded="false" />
-            <element signature="e#1680#2516#0" expanded="false" />
-            <element signature="e#2589#4957#0" expanded="false" />
-            <element signature="e#5006#5236#0" expanded="false" />
-            <element signature="e#5528#6609#0" expanded="false" />
-            <element signature="e#6704#8104#0" expanded="false" />
-            <element signature="e#8361#8690#0" expanded="false" />
+            <element signature="e#1066#1606#0" expanded="false" />
+            <element signature="e#1681#2517#0" expanded="false" />
+            <element signature="e#2590#4958#0" expanded="false" />
+            <element signature="e#5007#5237#0" expanded="false" />
+            <element signature="e#5529#6610#0" expanded="false" />
+            <element signature="e#8362#8691#0" expanded="false" />
+            <element signature="e#8720#9875#0" expanded="false" />
+            <element signature="e#13899#13944#0" expanded="false" />
           </folding>
         </state>
       </provider>

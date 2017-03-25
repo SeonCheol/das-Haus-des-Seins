@@ -16,7 +16,7 @@ class GrungerMonet:
     MIC_NUM = 2
     RATE = 44100
     FORMAT =pyaudio.paInt16
-    RECORD_SECONDS = 20
+    RECORD_SECONDS = 120
 
     idx2 = 0
 
@@ -281,13 +281,14 @@ class GrungerMonet:
 
     def saveFile(self, toSaveData):
         #fileName = "dataForsoundInfo" + str(self.idx2) + ".txt"
-        fileName="data/dataForsoundInfo0.txt";
-        file = open(fileName, 'w+')
+        fileName="data/dataForsoundInfo.csv";
+        file = open(fileName, 'a')
         for i in range(3):
             file.write(str(toSaveData[i]) + " ")
         file.write(str(self.idx2))
         self.idx2 += 1
         self.idx2 = int(self.idx2 % 1000000)
+        file.write("\n")
         file.close()
 
     def server(self):
@@ -332,6 +333,8 @@ class GrungerMonet:
                     strToSave = ""
                     for i in range(2):
                         data[i] = connection_list[i + 1].recv(1000)
+                        frames[i].append(data[i])
+
                         if data[i]:
                             data[i] = np.fromstring(data[i])
                             print data[i]
@@ -340,24 +343,25 @@ class GrungerMonet:
                                 strToSave  += str(i) + " "
                                 for j in range(len(data[i])):
                                     strToSave += str(data[i][j]) + " "
+                                connection_list[i+1].send('s')
 
                             except ValueError as e:
                                 print(e.message)
                         else:
                             # print "exit and save"
-                            # for j in range(2):
-                            #     # connection_list.remove(read_sock[j])
-                            #     num_client = 0
-                            #     filename = 'test' + str(j) + '.wav'
-                            #     wf = wave.open(filename, 'wb')
-                            #     wf.setnchannels(1)
-                            #     wf.setsampwidth(p.get_sample_size(self.FORMAT))
-                            #     wf.setframerate(self.RATE)
-                            #     wf.writeframes(b''.join(frames[j]))
-                            #     wf.close()
-                            #     connection_list[1].close()
-                            #     connection_list.remove(connection_list[1])
-                            #     print("the connection is closed", connection_list, j)
+                            for j in range(2):
+                                # connection_list.remove(read_sock[j])
+                                num_client = 0
+                                filename = 'test' + str(j) + '.wav'
+                                wf = wave.open(filename, 'wb')
+                                wf.setnchannels(1)
+                                wf.setsampwidth(p.get_sample_size(self.FORMAT))
+                                wf.setframerate(self.RATE)
+                                wf.writeframes(b''.join(frames[j]))
+                                wf.close()
+                                connection_list[1].close()
+                                connection_list.remove(connection_list[1])
+                                print("the connection is closed", connection_list, j)
                             sys.exit()
                     ## after retrieve the datas
                     file = open("data/dataForSound.data", "w+")
@@ -374,6 +378,7 @@ class GrungerMonet:
     def client(self):
         ## socket info
         HOST = '127.0.0.1'
+        # HOST = '39.115.18.70'
         PORT = 5810
         BUFF_SIZE = 1024
         ADDR = (HOST, PORT)
@@ -423,6 +428,7 @@ class GrungerMonet:
                 feature = self.getFeature(fft_data1)
                 print "???" , feature
                 clientSock.send(feature.tostring())
+                clientSock.recv(22)
 
 
             wf = wave.open('test.wav', 'wb')
