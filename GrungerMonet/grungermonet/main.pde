@@ -1,125 +1,4 @@
-//BlobKinnect Created by Chloe 2014
-// Inspired by Kinect Flow Example by Amnon Owed (15/09/12)
 
-// import libraries
-import SimpleOpenNI.*; // kinect
-import blobDetection.*; // blobs
-
-// this is a regular java import so we can use and extend the polygon class (see PolygonBlob)
-import java.awt.Polygon;
-import java.util.Collections;
-
-// declare SimpleOpenNI object
-SimpleOpenNI context;
-// declare BlobDetection object
-BlobDetection theBlobDetection;
-// declare custom PolygonBlob object (see class for more info)f
-PolygonBlob poly = new PolygonBlob();
-
-// PImage to hold incoming imagery and smaller one for blob detection
-PImage cam, blobs;
-// the kinect's dimensions to be used later on for calculations
-int kinectWidth = 640;
-int kinectHeight = 480;
-// to center and rescale from 640x480 to higher custom resolutions
-float reScale;
-float r = 0;
-// background color
-color bgColor;
-// three color palettes (artifact from me storing many interesting color palettes as strings in an external data file ;-)
-String[][] palettes = {
-  {
-    "-1117720,-13683658,-8410437,-9998215,-1849945,-5517090,-4250587,-14178341,-5804972,-3498634", 
-    "-67879,-9633503,-8858441,-144382,-4996094,-16604779,-588031", 
-    "-16711663,-13888933,-9029017,-5213092,-178706 3,-11375744,-2167516,-15713402,-5389468,-2064585"
-  }
-  , {
-    "-1117720,-13683658,-8410437,-9998215,-1849945,-5517090,-4250587,-14178341,-5804972,-3498634", 
-    "-16711663,-13888933,-9029017,-5213092,-178706 3,-11375744,-2167516,-15713402,-5389468,-2064585", 
-    "-67879,-9633503,-8858441,-144382,-4996094,-16604779,-588031"
-  }
-};
-
-
-int particleLength = 1300;
-// an array called flow of 2250 Particle objects (see Particle class)
-Particle[] flow = new Particle[particleLength];
-// global variables to influence the movement of all particles
-float globalX, globalY;
-
-void setup() {
-  // it's possible to customize this, for example 1920x1080
-  size(640, 480);
-
-  // initialize SimpleOpenNI object
-  context = new SimpleOpenNI(this);
-  if (!context.isInit()) {
-    // if context.enableScene() returns false
-    // then the Kinect is not working correctly
-    // make sure the green light is blinking
-    println("Kinect not connected!");
-    exit();
-  } else {
-    // mirror the image to be more intuitive
-    context.enableDepth();
-    context.enableUser();
-    context.setMirror(true);
-
-    // calculate the reScale value
-    // currently it's rescaled to fill the complete width (cuts of top-bottom)
-    // it's also possible to fill the complete height (leaves empty sides)
-    reScale = (float) width / kinectWidth; // reScale == 1
-
-    // create a smaller blob image for speed and efficiency
-    blobs = createImage(width, height, RGB);
-
-
-    // initialize blob detection object to the blob image dimensions
-    theBlobDetection = new BlobDetection(blobs.width, blobs.height);
-    theBlobDetection.setThreshold(0.2); // block strength
-    setupFlowfield();
-  }
-}
-
-void draw() {
-  background(0);
-  cam = createImage(width, height, RGB);
-  // update the SimpleOpenNI object
-  context.update();
-  // put the image into a PImage
-
-    int[]depthValues= context.depthMap();
-  int[] userMap = null;
-  int userCount = context.getNumberOfUsers();
-  System.gc();
-  if (userCount > 0) {
-    userMap = context.userMap();
-    cam.loadPixels();
-
-    for (int y=0; y<context.depthHeight (); y++) {
-      for (int x=0; x<context.depthWidth (); x++) {
-        int index = x + y * context.depthWidth();
-        if (userMap != null && userMap[index] > 0) {
-          cam.set(x, y, 255); // put your sample random text
-        }
-      }
-    }
-    cam.updatePixels();
-
-
-    //// copy the image into the smaller blob image
-    blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
-    // blur the blob image
-    blobs.filter(BLUR);
-    // detect the blobs
-    theBlobDetection.computeBlobs(blobs.pixels);
-    // clear the polygon (original functionality)
-    poly.reset();
-    // create the polygon from the blobs (custom functionality, see class)
-    poly.createPolygon();
-    drawFlowfield();
-  }
-}
 
 void setupFlowfield() {
   //// set stroke weight (for particle display) to 2.5
@@ -132,9 +11,29 @@ void setupFlowfield() {
   //  setRandomColors(1);
 }
 
+
+color setColor(float herz) {
+  color[] palette = {
+    color(204, 142, 193), color(47, 45, 92), color(76, 129, 255), color(42, 144, 54), 
+    color(253, 255, 84), color(255, 126, 50), color(256, 41, 0)
+  };
+  int lowBound = 50;
+  int highBound = 330;
+  int idx = int(herz - lowBound);
+  idx = int(herz / ((highBound - lowBound)/7));
+
+
+  int r =int( map(herz, lowBound, width/6*(idx+1), red(palette[idx]), red(palette[idx+1])));
+  int g =int( map(herz, width/6 *idx, width/6*(idx+1), green(palette[idx]), green(palette[idx+1])));
+  int b =int( map(herz, width/6 *idx, width/6*(idx+1), blue(palette[idx]), blue(palette[idx+1])));
+
+  return color(r, g, b);
+}
+
 void drawFlowfield() {
   for (int i=0; i < particleLength; i ++) {
-    flow[i].col = color(r, 0, 0);//colorPalette[int(random(1, colorPalette.length))];
+
+    flow[i].col = setColor(featureData[0][1]);//colorPalette[int(random(1, colorPalette.length))];
   }
   //// center and reScale from Kinect to custom dimensions
   translate(0, (height-kinectHeight*reScale)/2);
@@ -160,6 +59,8 @@ void setRandomColors(int nthFrame) {
 
     // set all particle colors randomly to color from palette (excluding first aka background color)
     for (int i=0; i < particleLength; i ++) {
+
+      println(r, g);
       flow[i].col = color(r, 0, 0);
     }
   }
@@ -172,11 +73,11 @@ void onLostUser(int userId) {
   println("lost: " + userId);
 }
 void keyPressed() {
-  if (keyCode == UP)
-    r += 10;
-  else if (keyCode == DOWN)
-    r -= 10;
-
-  println(r);
+  //  if (keyCode == UP)
+  //    r += 10;
+  //  else if (keyCode == DOWN)
+  //    r -= 10;
+  //
+  //  println(r);
 }
 

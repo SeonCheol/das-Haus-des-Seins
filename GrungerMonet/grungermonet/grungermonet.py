@@ -16,7 +16,7 @@ class GrungerMonet:
     MIC_NUM = 2
     RATE = 44100
     FORMAT =pyaudio.paInt16
-    RECORD_SECONDS = 120
+    RECORD_SECONDS = 300
 
     idx2 = 0
 
@@ -278,18 +278,18 @@ class GrungerMonet:
         decibel = self.decibel(fft_data[maxFreqIdx][0], max_idx)
         softness = self.deviation(fft_data, self.RATE)
         return np.array([maxFrq[0], decibel, softness])
-
-    def saveFile(self, toSaveData):
-        #fileName = "dataForsoundInfo" + str(self.idx2) + ".txt"
-        fileName="data/dataForsoundInfo.csv";
-        file = open(fileName, 'a')
-        for i in range(3):
-            file.write(str(toSaveData[i]) + " ")
-        file.write(str(self.idx2))
-        self.idx2 += 1
-        self.idx2 = int(self.idx2 % 1000000)
-        file.write("\n")
-        file.close()
+    #
+    # def saveFile(self, toSaveData):
+    #     #fileName = "dataForsoundInfo" + str(self.idx2) + ".txt"
+    #     fileName="data/dataForsoundInfo.data";
+    #     file = open(fileName, 'a')
+    #     for i in range(3):
+    #         file.write(str(toSaveData[i]) + ",")
+    #     file.write(str(self.idx2))
+    #     self.idx2 += 1
+    #     self.idx2 = int(self.idx2 % 1000000)
+    #     file.write("\n")
+    #     file.close()
 
     def server(self):
         HOST = ''
@@ -332,7 +332,7 @@ class GrungerMonet:
                 elif num_client == 2:
                     strToSave = ""
                     for i in range(2):
-                        data[i] = connection_list[i + 1].recv(1000)
+                        data[i] = connection_list[i + 1].recv(1024)
                         frames[i].append(data[i])
 
                         if data[i]:
@@ -364,6 +364,7 @@ class GrungerMonet:
                                 print("the connection is closed", connection_list, j)
                             sys.exit()
                     ## after retrieve the datas
+                    strToSave += "\n"
                     file = open("data/dataForSound.data", "w+")
                     file.write(strToSave)
                     file.close()
