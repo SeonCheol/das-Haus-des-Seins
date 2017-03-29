@@ -21,11 +21,16 @@ color setColor(float herz) {
   int highBound = 330;
   int idx = int(herz - lowBound);
   idx = int(herz / ((highBound - lowBound)/7));
+  int r, g, b;
+  r = g = b= 0;
 
-
-  int r =int( map(herz, lowBound, width/6*(idx+1), red(palette[idx]), red(palette[idx+1])));
-  int g =int( map(herz, width/6 *idx, width/6*(idx+1), green(palette[idx]), green(palette[idx+1])));
-  int b =int( map(herz, width/6 *idx, width/6*(idx+1), blue(palette[idx]), blue(palette[idx+1])));
+  try {
+    r =int( map(herz, lowBound, width/6*(idx+1), red(palette[idx]), red(palette[idx+1])));
+    g =int( map(herz, width/6 *idx, width/6*(idx+1), green(palette[idx]), green(palette[idx+1])));
+    b =int( map(herz, width/6 *idx, width/6*(idx+1), blue(palette[idx]), blue(palette[idx+1])));
+  } 
+  catch(Exception e) {
+  }
 
   return color(r, g, b);
 }
@@ -72,6 +77,40 @@ void onNewUser(int userId) {
 void onLostUser(int userId) {
   println("lost: " + userId);
 }
+
+
+// second argument is my color
+void drawBlobsAndEdges(boolean drawEdges, color c) {
+  noFill();
+  Blob b;
+  EdgeVertex eA, eB;
+  for (int n = 0; n < theBlobDetection.getBlobNb (); n++) {
+    b = theBlobDetection.getBlob(n);
+    if (b != null) {
+      if (drawEdges) {
+
+        stroke(c, 50);
+        for (int m = 0; m < b.getEdgeNb (); m++) {
+          eA = b.getEdgeVertexA(m);
+          eB = b.getEdgeVertexB(m);
+          if ( eA != null && eB != null) {
+            strokeWeight(3);
+            x = eA.x * width + random(-30, 30);
+            y = eA.y * height + random(-30, 30);
+            if (m % 10 == 0) {
+              point(x, y);
+              strokeWeight(1);
+              line(eA.x * width, eA.y * height, x, y);
+            }
+            strokeWeight(1);
+            line(eA.x * width, eA.y * height, eB.x * width, eB.y * height);
+          }
+        }
+      }
+    }
+  }
+}
+
 void keyPressed() {
   //  if (keyCode == UP)
   //    r += 10;

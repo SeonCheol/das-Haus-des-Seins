@@ -12,11 +12,11 @@ import wave
 import sys
 
 class GrungerMonet:
-    CHUNK = 1024
+    CHUNK = 2048
     MIC_NUM = 2
     RATE = 44100
     FORMAT =pyaudio.paInt16
-    RECORD_SECONDS = 300
+    RECORD_SECONDS = 400
 
     idx2 = 0
 
@@ -87,10 +87,8 @@ class GrungerMonet:
             tmp_data2 = data2.T[0][(i * interval) * fs:(i + 1) * interval * fs]
 
             delay = self.get_delay_time_gcc(tmp_data1, tmp_data2)
-            print delay
 
             location = self.cal_location(delay)
-            print location
             dot.append(location)
 
         plt.plot(dot, range(0, len(dot)), 'ro')
@@ -165,7 +163,7 @@ class GrungerMonet:
             else:
                 plt.clf()
 
-            print(energy, mean_energy, self.isVoice, self.idx)
+            # print(energy, mean_energy, self.isVoice, self.idx)
     def cal_location(self, delay_time):
         meter_per_dot = round(self.dist*1.0 / self.width, 5)
 
@@ -272,12 +270,35 @@ class GrungerMonet:
             self.saveFile(feature)
             print feature, self.idx2
 
-    def getFeature(self, fft_data):
-        maxFrq, maxFreqIdx = self.maxFrequencyForFFT(fft_data, self.RATE)
+    def maxFreq(self, fftData,  size):
+        lowPoint = 95
+        highPoint = 300
+        sum = 0
+        frqSum = 0
+
+        fftfrq = np.fft.fftfreq(size, d=1.0 / self.RATE)
+        fftfrq = fftfrq[range(int(size / 2))]
+
+        lowIdx = np.searchsorted(fftfrq, lowPoint)
+        highIdx = np.searchsorted(fftfrq, highPoint)
+        tmp = fftData[lowIdx:highIdx]
+
+        maxIdx = tmp.argmax()
+        # print maxIdx,  " Max", tmp
+        for i in range(maxIdx - 1, maxIdx + 1):
+            frqSum += fftfrq[i + lowIdx] * int(fftData[i+lowIdx])
+            sum += int(fftData[i+lowIdx])
+        thefreq = frqSum * 1.0 / sum
+        return maxIdx + lowIdx, thefreq
+
+    def getFeature(self, fft_data, size):
+        # maxFrq, maxFreqIdx = self.maxFrequencyForFFT(fft_data, self.RATE)
+
+        maxFreqIdx, maxFrq  = self.maxFreq(fft_data, size)
         max_idx = np.argmax(fft_data)
-        decibel = self.decibel(fft_data[maxFreqIdx][0], max_idx)
+        decibel = self.decibel(fft_data[maxFreqIdx], fft_data[max_idx])
         softness = self.deviation(fft_data, self.RATE)
-        return np.array([maxFrq[0], decibel, softness])
+        return np.array([maxFrq, decibel, softness])
     #
     # def saveFile(self, toSaveData):
     #     #fileName = "dataForsoundInfo" + str(self.idx2) + ".txt"
@@ -337,14 +358,16 @@ class GrungerMonet:
 
                         if data[i]:
                             data[i] = np.fromstring(data[i])
-                            print data[i]
-
+                            print data[i] , i
                             try:
-                                strToSave  += str(i) + " "
-                                for j in range(len(data[i])):
-                                    strToSave += str(data[i][j]) + " "
-                                connection_list[i+1].send('s')
-
+                                if math.isnan(data[i][0]):
+                                    strToSave += str(-1) + " "
+                                else:
+                                    strToSave  += str(i) + " "
+                                    for j in range(len(data[i])):
+                                        strToSave += str(data[i][j]) + " "
+                                    # print strToSave
+                                connection_list[i + 1].send('s')
                             except ValueError as e:
                                 print(e.message)
                         else:
@@ -368,13 +391,9 @@ class GrungerMonet:
                     file = open("data/dataForSound.data", "w+")
                     file.write(strToSave)
                     file.close()
-
-
             except KeyboardInterrupt:
                 serverSock.close()
                 sys.exit()
-
-
 
     def client(self):
         ## socket info
@@ -392,55 +411,44 @@ class GrungerMonet:
         # RECORD_SECONDS = 1000
 
         clientSock = socket(AF_INET, SOCK_STREAM)
-
         p = pyaudio.PyAudio()
         stream = p.open(format=self.FORMAT, channels=1,
                         rate=self.RATE, input=True, frames_per_buffer=self.CHUNK)
         n = int((self.RATE / self.CHUNK) * self.RECORD_SECONDS)
         frames = []
+        energyFile = open("data/voiceEnergyResult.data", "r")
+        energyAnal = energyFile.readline().split(" ")
+        energyFile.close()
         try:
             clientSock.connect(ADDR)
-
             print("wait...")
             clientSock.recv(22)
-
             print("Recording....")
             mean_energy = 0
             for i in range(0, n):
                 data = stream.read(self.CHUNK)
-                print(i)
                 frames.append(data)
                 # clientSock.send(data)
                 data = np.fromstring(data, dtype='int16')
-
                 energy = af.stEnergy(data)
-                print("energy ", energy)
-                if ((self.idx % 100) == 0):
-                    self.sum_energy = mean_energy
-                self.sum_energy = self.sum_energy + energy
-                mean_energy = round(self.sum_energy / (self.idx + 1), 4)
-                self.idx = self.idx + 1
-                self.idx = self.idx % 100
-                if mean_energy <= energy:
-                    self.isVoice = True
+                if float(energyAnal[0])* 9.0/10< energy:
+                    fft_data1 = np.fft.fft(data)
+                    fft_data1 = abs(fft_data1)
+                    feature = self.getFeature(fft_data1, data.size)
+                    clientSock.send(feature.tostring())
+                    clientSock.recv(22)
                 else:
-                    self.isVoice = False
-                fft_data1 = np.fft.fft(data)
-                feature = self.getFeature(fft_data1)
-                print "???" , feature
-                clientSock.send(feature.tostring())
-                clientSock.recv(22)
+                    clientSock.send(np.array([-1, -1]).tostring())
 
+                    clientSock.recv(22)
 
-            wf = wave.open('test.wav', 'wb')
-            wf.setnchannels(1)
-            wf.setsampwidth(p.get_sample_size(self.FORMAT))
-            wf.setframerate(self.RATE)
-            wf.writeframes(b''.join(frames))
-            wf.close()
-
+            # wf = wave.open('test.wav', 'wb')
+            # wf.setnchannels(1)
+            # wf.setsampwidth(p.get_sample_size(self.FORMAT))
+            # wf.setframerate(self.RATE)
+            # wf.writeframes(b''.join(frames))
+            # wf.close()
         except Exception as e:
             print(e.message)
             sys.exit()
-
         print("connect")

@@ -57,6 +57,11 @@ float featureData [][] = new float [2][4];
 float size =8;
 float sum_size = 0;
 int idx = 1;
+color detectionColor;
+
+float x, y;
+boolean isVoice = false;
+
 void setup() {
 
   // it's possible to customize this, for example 1920x1080
@@ -64,6 +69,10 @@ void setup() {
 
   // initialize SimpleOpenNI object
   context = new SimpleOpenNI(this);
+
+
+  // initialize my color
+  detectionColor = color(255, 255, 255);
   if (!context.isInit()) {
     // if context.enableScene() returns false
     // then the Kinect is not working correctly
@@ -84,7 +93,6 @@ void setup() {
     // create a smaller blob image for speed and efficiency
     blobs = createImage(width, height, RGB);
 
-
     // initialize blob detection object to the blob image dimensions
     theBlobDetection = new BlobDetection(blobs.width, blobs.height);
     theBlobDetection.setThreshold(0.2); // block strength
@@ -95,41 +103,44 @@ void setup() {
 
 void draw() {
   background(0);
-  cam = createImage(width, height, RGB);
-  // update the SimpleOpenNI object
-  context.update();
-  // put the image into a PImage
+  //println(isVoice);
+  if (isVoice) {
+    //  if (true) {
+    cam = createImage(width, height, RGB);
+    // update the SimpleOpenNI object
+    context.update();
+    // put the image into a PImage
 
-    int[]depthValues= context.depthMap();
-  int[] userMap = null;
-  int userCount = context.getNumberOfUsers();
-  System.gc();
-  if (userCount > 0) {
-    userMap = context.userMap();
-    cam.loadPixels();
-
-    for (int y=0; y<context.depthHeight (); y++) {
-      for (int x=0; x<context.depthWidth (); x++) {
-        int index = x + y * context.depthWidth();
-        if (userMap != null && userMap[index] > 0) {
-          cam.set(x, y, 255); // put your sample random text
+      int[]depthValues= context.depthMap();
+    int[] userMap = null;
+    int userCount = context.getNumberOfUsers();
+    System.gc();
+    if (userCount > 0) {
+      userMap = context.userMap();
+      cam.loadPixels();
+      for (int y=0; y<context.depthHeight (); y++) {
+        for (int x=0; x<context.depthWidth (); x++) {
+          int index = x + y * context.depthWidth();
+          if (userMap != null && userMap[index] > 0) {
+            cam.set(x, y, 255); // put your sample random text
+          }
         }
       }
+      cam.updatePixels();
+      //// copy the image into the smaller blob image
+      blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
+      // blur the blob image
+      blobs.filter(BLUR);
+      // detect the blobs
+      theBlobDetection.computeBlobs(blobs.pixels);
+      // clear the polygon (original functionality)
+      poly.reset();
+      // create the polygon from the blobs (custom functionality, see class)
+      poly.createPolygon();
+      // drawFlowfield();
+      detectionColor =  setColor(featureData[0][1]);
+      drawBlobsAndEdges(true, detectionColor);
     }
-    cam.updatePixels();
-
-
-    //// copy the image into the smaller blob image
-    blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
-    // blur the blob image
-    blobs.filter(BLUR);
-    // detect the blobs
-    theBlobDetection.computeBlobs(blobs.pixels);
-    // clear the polygon (original functionality)
-    poly.reset();
-    // create the polygon from the blobs (custom functionality, see class)
-    poly.createPolygon();
-    drawFlowfield();
   }
   thread("readFile");
 }
@@ -154,15 +165,19 @@ void readFile() {
       for (int i=0; i<8; i++) {
         try {
           featureData[i/4][i%4] = float(splitData[i]);
-          print(featureData[i/4][i%4]+ " ");
+          //  print(featureData[i/4][i%4]+ " ");
         }  
         catch (Exception e) {
           continue;
         }
         if (Double.isNaN(featureData[i/4][i%4])) {
-          println("nan");
+
           break;
         }
+        if (featureData[0][0] == float(-1))
+          isVoice = false;
+        else 
+          isVoice = true;
       }
       reader.close();
     }
@@ -174,6 +189,5 @@ void readFile() {
   catch(NullPointerException e) {
     e.printStackTrace();
   }
-  println("===============================");
 }
 

@@ -32,18 +32,21 @@ for i in range(0, n):
     frames.append(data)
     data = np.fromstring(data, dtype='int16')
     # delay_time, cor = td.get_delay(data, data, RATE)
+    fft_data = np.fft.fft(data)
+    fft_data = abs(fft_data[range(int(len(fft_data)/2))])
+    frq = np.fft.fftfreq(data.size, d=1.0/RATE)
+    frq = frq[range(int(len(frq)/2))]
+    #gcc_result = gcc.xcorr_freq(data, data)
+    # k = int(len(gcc_result)/2)
+    # t = np.arange(-k / RATE, k / RATE, 1.0 / RATE)
+    # max_idx = np.argmax(gcc_result)
+    # delay_time = abs((max_idx+1) - k/2) /RATE
 
-    gcc_result = gcc.xcorr_freq(data, data)
-    k = int(len(gcc_result)/2)
-    t = np.arange(-k / RATE, k / RATE, 1.0 / RATE)
-    max_idx = np.argmax(gcc_result)
-    delay_time = abs((max_idx+1) - k/2) /RATE
-    #
-    # plt.plot(t, gcc_result[1:])
+    #plt.plot(t, gcc_result[1:])
     # plt.plot(data)
-    # plt.draw(), plt.pause(0.00001)
-    # plt.clf()
-    print(t[max_idx], max_idx, k , len(data))
+    plt.plot(frq, fft_data)
+    plt.draw(), plt.pause(0.00001)
+    plt.clf()
 
 stream.stop_stream()
 stream.close()

@@ -35,7 +35,7 @@ class PolygonBlob extends Polygon {
             float dn = dist(eA.x*kinectWidth, eA.y*kinectHeight, fn.x*kinectWidth, fn.y*kinectHeight);
             float dp = dist(eA.x*kinectWidth, eA.y*kinectHeight, fp.x*kinectWidth, fp.y*kinectHeight);
             // if either distance is bigger than 15
-            if (dn > 15 || dp > 15) {
+            if (dn > 20 || dp > 20) {
               // if the current contour size is bigger than zero
               if (contour.size() > 0) {
                 // add final point

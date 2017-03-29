@@ -128,27 +128,27 @@ if __name__== "__main__":
 
 
         # print fftfrq[max]
+        plt.cla()
 
-        #
-        # ax[0].plot(t, y, 'b')
-        # ax[0].set_xlabel('Time')
-        # ax[0].set_ylabel('Amplitude')
-        # ax[0].grid(True)
-        # plt.cla()
-        # ax[1].plot(fftfrq, abs(Y), 'r')
-        # ax[1].set_xlabel('Freq (Hz)')
-        # ax[1].set_ylabel('|Y(freq)|')
-        # ax[1].set_xlim(0,500)
-        # # ax[1].vlines(frq, [0], abs(Y))
-        # ax[1].grid(True)
-        # plt.draw()
-        # plt.pause(0.00001)
-        # plt.cla()
+        ax[0].plot(t, y[range(int(len(y)/2))], 'b')
+        ax[0].set_xlabel('Time')
+        ax[0].set_ylabel('Amplitude')
+        ax[0].grid(True)
+        plt.cla()
+        ax[1].plot(fftfrq, abs(Y), 'r')
+        ax[1].set_xlabel('Freq (Hz)')
+        ax[1].set_ylabel('|Y(freq)|')
+        ax[1].set_xlim(0,500)
+        # ax[1].vlines(frq, [0], abs(Y))
+        ax[1].grid(True)
+        plt.draw()
+        plt.pause(0.00001)
+        plt.cla()
         ene = af.stEnergy(y)
-        if float(energyAnal[0])+ float(energyAnal[1])*0.25< ene:
-            max = maxFreq(Y, fs, y.size, fftfrq)
-            print("talk!!")
-            print(max), ene
+        # if float(energyAnal[0])< ene:
+        #     max = maxFreq(Y, fs, y.size, fftfrq)
+        #     print("talk!!")
+        #     print(max), ene
 
         #else: print("____________________-----------")
         # file.write(str(abs(ene)) + " ")
