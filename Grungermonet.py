@@ -75,6 +75,11 @@ class GrungerMonet:
 
         # print meter_per_dot, diff_from_cent, loc
         return round(loc, 5)
+    ## get sound speed
+    def sound_speed(self, temperature=15):
+        tmp = (273 + temperature) / 288
+        tmp = round(tmp, 3)
+        return 340.3 * math.sqrt(tmp)
     ## return fft_result and frq axis array
     def maxFrequency(X, F_sample, Low_cutoff=80, High_cutoff=300):
         """ Searching presence of frequencies on a real signal using FFT
@@ -208,29 +213,32 @@ class GrungerMonet:
     #     file.write("\n")
     #     file.close()
 
-    def saveEnergyToTraining(self, ene):
-        file = open("data/energyDataForTrainigToLocSound.data", "a")
-        file.write(str(self.sum_energy[0] * 1.0 / self.idx) + " " + str(self.sum_energy[1] * 1.0 / self.idx))
-        file.write(",")
-
 
     def findLoc(self, ene1, ene2):
-        self.idx += 1
-        if self.idx == 10:
+        idx += 1
+        if idx == 1:
             self.sum_energy[0] = 0
             self.sum_energy[1] = 0
+
             ## save the data for training
             file = open("data/energyDataForTrainigToLocSound.data", "a")
-            file.write(str(self.sum_energy[0] * 1.0 / self.idx) + " " + str(self.sum_energy[1] * 1.0 / self.idx))
+            file.write(str(self.sum_energy[0]) + " " + str(self.sum_energy[1]))
             file.write(",")
+
+
         self.sum_energy[0] += ene1
         self.sum_energy[1] += ene2
-        self.idx = self.idx % 10
+
+        mean1 = self.sum_energy[0] * 1.0 / idx
+        mean2 = self.sum_energy[1] * 1.0 / idx
+
+        idx = idx % 10
+
 
     def server(self):
         HOST = ''
         PORT = 5810
-        BUF_SIZE = self.CHUNK
+        BUF_SIZE = 1024
         ADDR = (HOST, PORT)
         NUM = 2
 
@@ -266,7 +274,7 @@ class GrungerMonet:
                 elif num_client == 2:
                     strToSave = ""
                     for i in range(2):
-                        data[i] = connection_list[i + 1].recv(self.CHUNK)
+                        data[i] = connection_list[i + 1].recv(1024)
                         frames[i].append(data[i])
                         if data[i]:
                             data[i] = np.fromstring(data[i])
@@ -311,7 +319,7 @@ class GrungerMonet:
         HOST = '127.0.0.1'
         # HOST = '39.115.18.70'
         PORT = 5810
-        BUFF_SIZE = self.CHUNK
+        BUFF_SIZE = 1024
         ADDR = (HOST, PORT)
 
         ## record info
@@ -342,7 +350,7 @@ class GrungerMonet:
                 # clientSock.send(data)
                 data = np.fromstring(data, dtype='int16')
                 energy = af.stEnergy(data)
-                if float(energyAnal[0])* 9.0/10 < energy:
+                if float(energyAnal[0])* 9.0/10< energy:
                     fft_data1 = np.fft.fft(data)
                     fft_data1 = abs(fft_data1)
                     feature = self.getFeature(fft_data1, data.size)
