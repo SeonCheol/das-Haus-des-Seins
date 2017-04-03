@@ -4,6 +4,14 @@ import sys
 import numpy as np
 from math import *
 
+
+def normalize(data, mean, std):
+    normalized = data - mean
+    normalized = normalized * 1.0  /std
+
+    return normalized
+
+
 def analTheTrainingFile():
     file = open("data/energyDataForTrainingMic1.data", "r")
     stream = file.readlines()
@@ -15,7 +23,7 @@ def analTheTrainingFile():
     std = sqrt(np.var(datas))
 
     file.close()
-    f = open("data/energyMic2Result.data", "w+")
+    f = open("data/energyMic1Result.data", "w+")
     f.write(str(mean) + " " + str(std))
     f.close()
 
@@ -35,15 +43,13 @@ if __name__ == "__main__":
     stream = p.open(format=FORMAT, channels=1,
                     rate=RATE, input=True, frames_per_buffer=CHUNK)
     n = int((RATE / CHUNK) * RECORD_SECONDS)
-    file = open("data/energyMic1Result.data", "r")
-    t = file.readlines()
-    t = t[0].split(" ")
-    t = map(float, t)
-    file.close()
+    # file = open("data/energyMic1Result.data", "r")
+    # t = file.readlines()
+    # t = t[0].split(" ")
+    # t = map(float, t)
+    # file.close()
 
-    file = open("data/energyDataForTrainingMic1.data", "a")
-
-
+    file = open("data/energyDataForTrainingMic1.data", "w+")
 
     for i in range(0, n):
         # if (idx % 10 == 0):
@@ -56,9 +62,9 @@ if __name__ == "__main__":
         fft_data1 = np.fft.fft(data)
         fft_data1 = abs(fft_data1) / (len(fft_data1)/2)
         sum = np.sum(fft_data1)
-        if t[0] + t[1]*2< sum:
-            print "sum  ==============================", sum
-        # print(sum, t[0])
+        # if t[0] + t[1]*2< sum:
+            # print "sum  ==============================", normalize(sum, t[0], t[1])
+        print(sum)
         file.write(str(sum) + " ")
     file.close()
 
