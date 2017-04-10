@@ -10,8 +10,9 @@ from socket import *
 from select import *
 import wave
 import sys
-
+from SoundLocalizer import *
 from pip._vendor.ipaddress import summarize_address_range
+import time
 
 
 class RingList:
@@ -76,9 +77,18 @@ class GrungerMonet:
     ## for solution to delay mic data
     energyList = RingList(10)
 
+    ## for threshold reset
+    threshold = RingList(200)
+
+
+
     def __init__(self):
         ## initalize the variables
         print("start the app")
+
+        ##  Observer pattern
+        self.matchListener = OnMatchListener()
+        self.localizer = Localizer(self.matchListener)
 
     ## for the test use two record files
     def cal_location(self, delay_time):
@@ -221,7 +231,6 @@ class GrungerMonet:
             print "ene 1 : ", ene1, " ene2 : ", ene2, " max : ", self.energy_max, " idx: ", self.idx, self.energy_min, self.energy_max
             return result
 
-
         self.idx += 1
         self.idx %= 400
         #
@@ -278,6 +287,9 @@ class GrungerMonet:
                                     tmp_sock.send('s')
                 elif num_client == 2:
                     strToSave = ""
+                    time1 = 0
+                    time2 = 0
+
                     for i in range(2):
                         data[i] = connection_list[i + 1].recv(self.CHUNK)
                         if data[i]:
@@ -300,13 +312,18 @@ class GrungerMonet:
                     ## after retrieve the datas
                     strToSave += " "
 
-                    loc = self.findLoc(data[0][-1], data[1][-1])
+                    time1 = data[0][-1]
+                    time2 = data[1][-1]
+                    ##loc = self.findLoc(data[0][-1], data[1][-1])
+                    self.localizer.updateQueue(time1, time2)
+                    loc = self.matchListener.getPosition()
+                    self.matchListener.reset()
                     if loc != -100:
                         strToSave += str(loc)
                         print strToSave
 
                     self.isVoice = False
-                    file = open("locationTest/data/dataForSound.data", "w+")
+                    file = open("data/dataForSound.data", "w+")
                     file.write(strToSave)
                     file.close()
             except KeyboardInterrupt:
@@ -328,6 +345,8 @@ class GrungerMonet:
         energyFile = open("data/energyMic1Result.data", "r")
         energyAnal = energyFile.readline().split(" ")
         energyAnal = map(float, energyAnal) ## [0]: mean ## [1]: std
+        print "energy : " , energyAnal
+        self.threshold.append(energyAnal[0])
         energyFile.close()
 
         try:
@@ -345,11 +364,17 @@ class GrungerMonet:
                 if energyAnal[0] + energyAnal[1]*2.0 < energy:
                     print energy
                     energy = self.normalize(energy, energyAnal[0], energyAnal[1])
-                    feature = self.getFeature(fft_data1, data.size)
-                    feature = np.append(feature, energy)
+                    feature = self.getFeature(fft_data1, data.size) ## maxFrq, softness return
+                    #feature = np.append(feature, energy)
+                    feature = np.append(feature, time.time())
                     clientSock.send(feature.tostring())
                     clientSock.recv(22)
                 else:
+                    self.threshold.append(energy)
+                    if self.threshold.size() > 100:
+                        energyAnal[0] = np.mean(self.threshold.__data__)
+                        energyAnal[1] = math.sqrt(np.var(self.threshold.__data__))
+                        print "energy : " , energyAnal
                     clientSock.send(np.array([-1, -1]).tostring())
                     clientSock.recv(22)
         except Exception as e:

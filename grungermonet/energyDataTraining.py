@@ -35,7 +35,7 @@ if __name__ == "__main__":
     MIC_NUM = 2
     RATE = 44100
     FORMAT = pyaudio.paInt16
-    RECORD_SECONDS = 500
+    RECORD_SECONDS = 300
 
     sum_energy = 0
     idx = 0
