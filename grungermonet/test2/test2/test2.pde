@@ -23,7 +23,6 @@ int kinectHeight = 480;
 // to center and rescale from 640x480 to higher custom resolutions
 float reScale;
 float x, y;
-float xB, yB;
 // background color
 color bgColor;
 // global variables to influence the movement of all particles
@@ -35,13 +34,12 @@ HashMap<Integer, System> userSystem;
 System defaultSystem;
 int userCount;
 PVector position = new PVector(0, 0);
-
 void setup() {
   // it's possible to customize this, for example 1920x1080
   //size(640, 480, P2D);
-  size(1920, 1080, OPENGL);
+  size(1900, 1040, OPENGL);
   userSystem = new HashMap<Integer, System>();
-  for (int i=0; i<3; i++) {
+  for(int i=0; i<3; i++){
     System s = new System();
     userSystem.put(i, s);
   }
@@ -64,7 +62,8 @@ void setup() {
     // it's also possible to fill the complete height (leaves empty sides)
     reScale = (float) width / kinectWidth;
     // create a smaller blob image for speed and efficiency
-    blobs = createImage(kinectWidth/2, kinectHeight/2, RGB);
+    blobs = createImage(kinectWidth/3, kinectHeight/3, RGB);
+
 
     // initialize blob detection object to the blob image dimensions
     theBlobDetection = new BlobDetection(blobs.width, blobs.height);
@@ -72,18 +71,11 @@ void setup() {
     theBlobDetection.setPosDiscrimination(true);
     //user end
     theBlobDetection.setThreshold(0.2);
-    isVoice = false;
-    //isVoice = 0;
   }
-
-
-  curTime = second();
 }
 
 void draw() {
-  //background(255);
-  fill(255, 50);
-  rect(0, 0, width, height);
+  background(0);
   cam = createImage(width, height, RGB);
   // update the SimpleOpenNI object
   context.update();
@@ -93,31 +85,30 @@ void draw() {
   int[] userMap = null;
   int userCount = context.getNumberOfUsers();
   //if (userCount > 0) {
-  userMap = context.userMap();
-  cam.loadPixels();
+    userMap = context.userMap();
+    cam.loadPixels();
 
-  for (int y=0; y<context.depthHeight (); y++) {
-    for (int x=0; x<context.depthWidth (); x++) {
-      int index = x + y * context.depthWidth();
-      if (userMap != null && userMap[index] > 0) {
-        cam.set(x, y, 255); // put your sample random text
+    for (int y=0; y<context.depthHeight (); y++) {
+      for (int x=0; x<context.depthWidth (); x++) {
+        int index = x + y * context.depthWidth();
+        if (userMap != null && userMap[index] > 0) {
+          cam.set(x, y, 255); // put your sample random text
+        }
       }
     }
-  }
-  cam.updatePixels();
-  //// copy the image into the smaller blob image
-  blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
-  // blur the blob image
-  blobs.filter(BLUR);
-  // detect the blobs
-  theBlobDetection.computeBlobs(blobs.pixels);
-  //user start
-  drawBlobsAndEdges();
-  soundX = readFile();
+    cam.updatePixels();
+
+
+    //// copy the image into the smaller blob image
+    blobs.copy(cam, 0, 0, cam.width, cam.height, 0, 0, blobs.width, blobs.height);
+    // blur the blob image
+    blobs.filter(BLUR);
+    // detect the blobs
+    theBlobDetection.computeBlobs(blobs.pixels);
+    //user start
+    drawBlobsAndEdges();
   //}
-  fill(255, 0, 0);  
-  //println("sound ::: ", soundX, width, kinectWidth, kinectHeight, mouseX, "-----------------------------------");
-  //ellipse(soundX/2, kinectHeight/2, 50, 50);
+  
 }
 
 void onNewUser(int userId) {
@@ -128,10 +119,10 @@ void onLostUser(int userId) {
 }
 
 void onVisibleUser(SimpleOpenNI curContext, int userId) {
-  // println("onVisibleUser - userId: " + userId);
-  //  if (userId > userSystem.size()) {
-  //    System s = new System();
-  //    userSystem.put(userId, s);
-  //  }
+  println("onVisibleUser - userId: " + userId);
+//  if (userId > userSystem.size()) {
+//    System s = new System();
+//    userSystem.put(userId, s);
+//  }
 }
 

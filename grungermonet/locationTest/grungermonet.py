@@ -14,7 +14,6 @@ from SoundLocalizer import *
 from pip._vendor.ipaddress import summarize_address_range
 import time
 
-
 class RingList:
     def __init__(self, length):
         self.__data__ = []
@@ -61,7 +60,7 @@ class GrungerMonet:
     idx2 = 0
 
     # the time delayed from another signal
-    time_delay = 0
+    time_delay = [0, 0]
 
     # signal data from mics
 
@@ -88,7 +87,7 @@ class GrungerMonet:
 
         ##  Observer pattern
         self.matchListener = OnMatchListener()
-        self.localizer = Localizer(self.matchListener)
+        self.localizer = Localizer(self.matchListener, 1.1)
 
     ## for the test use two record files
     def cal_location(self, delay_time):
@@ -271,6 +270,7 @@ class GrungerMonet:
         num_client = 0
         data = [None, None]
 
+        self.localizer.start()
         while connection_list:
             try:
                 # requested with select , and unblock every 10 seconds
@@ -285,6 +285,7 @@ class GrungerMonet:
                             if num_client == 2:
                                 for tmp_sock in connection_list[1:]:
                                     tmp_sock.send('s')
+
                 elif num_client == 2:
                     strToSave = ""
                     time1 = 0
@@ -303,6 +304,7 @@ class GrungerMonet:
                                         strToSave += str(data[i][j]) + " "
                                     # print strToSave
                                 connection_list[i + 1].send('s')
+
                             except ValueError as e:
                                 print(e.message)
                         else:
@@ -312,8 +314,11 @@ class GrungerMonet:
                     ## after retrieve the datas
                     strToSave += " "
 
-                    time1 = data[0][-1]
-                    time2 = data[1][-1]
+                    time1 = float(data[0][-1])
+                    time2 = float(data[1][-1])
+                    delay_time = self.time_delay[1] - self.time_delay[0]
+                    print " delay time :: :", delay_time, " time2 :: ", time2
+
                     ##loc = self.findLoc(data[0][-1], data[1][-1])
                     self.localizer.updateQueue(time1, time2)
                     loc = self.matchListener.getPosition()
@@ -326,6 +331,7 @@ class GrungerMonet:
                     file = open("data/dataForSound.data", "w+")
                     file.write(strToSave)
                     file.close()
+
             except KeyboardInterrupt:
                 serverSock.close()
                 sys.exit()
@@ -362,11 +368,13 @@ class GrungerMonet:
                 energy = np.sum(fft_data1)
 
                 if energyAnal[0] + energyAnal[1]*2.0 < energy:
-                    print energy
+                    t = time.time()
+                    print "======================================"
+                    print t
                     energy = self.normalize(energy, energyAnal[0], energyAnal[1])
                     feature = self.getFeature(fft_data1, data.size) ## maxFrq, softness return
                     #feature = np.append(feature, energy)
-                    feature = np.append(feature, time.time())
+                    feature = np.append(feature, t)
                     clientSock.send(feature.tostring())
                     clientSock.recv(22)
                 else:
@@ -374,11 +382,9 @@ class GrungerMonet:
                     if self.threshold.size() > 100:
                         energyAnal[0] = np.mean(self.threshold.__data__)
                         energyAnal[1] = math.sqrt(np.var(self.threshold.__data__))
-                        print "energy : " , energyAnal
                     clientSock.send(np.array([-1, -1]).tostring())
                     clientSock.recv(22)
         except Exception as e:
             print(e.message)
             sys.exit()
         print("connect")
-

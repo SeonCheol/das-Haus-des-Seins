@@ -51,7 +51,7 @@ class RingList:
 
 
 class GrungerMonet:
-    CHUNK = 2048
+    CHUNK = 1024
     MIC_NUM = 2
     RATE = 44100
     FORMAT = pyaudio.paInt16
@@ -74,9 +74,20 @@ class GrungerMonet:
     energy_min = -.5
 
     ## for solution to delay mic data
-    energyList = RingList(10)
+    energyList = RingList(3)
 
-    def __init__(self):
+    ## for threshold reset
+    threshold = RingList(200)
+
+    diffVal = RingList(500)
+
+
+    originalThresholdVal = 10000
+
+
+
+
+    def __init__(se1lf):
         ## initalize the variables
         print("start the app")
 
@@ -162,8 +173,8 @@ class GrungerMonet:
 
 
     def maxFreq(self, fftData, size):
-        lowPoint = 95
-        highPoint = 300
+        lowPoint = 60
+        highPoint = 360
         sum = 0
         frqSum = 0
 
@@ -212,37 +223,50 @@ class GrungerMonet:
 
         if math.isnan(ene1) and math.isnan(ene2):
             return -100
-        elif math.isnan(ene1) : ene1 = 0
-        elif math.isnan(ene2) :
-            ene2 = 0
-            result = 1
-            self.energyList.append(result)
-            result = np.mean(self.energyList.__data__)
-            print "ene 1 : ", ene1, " ene2 : ", ene2, " max : ", self.energy_max, " idx: ", self.idx, self.energy_min, self.energy_max
-            return result
-
-
+        elif math.isnan(ene1): ene1 = 0
+        elif math.isnan(ene2): ene2 = 0
+            # self.energyList.append(result)
+            # result = np.mean(self.energyList.__data__)
+            # print "ene 1 : ", ene1, " ene2 : ", ene2, " max : ", self.energy_max, " idx: ", self.idx, self.energy_min, self.energy_max
+            # return result
+        diff_val = ene1 - ene2
         self.idx += 1
         self.idx %= 400
-        #
         # if(self.idx == 0):
         #     self.energy_max = 1.0
         #     self.energy_min = -.5
-        #
+        # else:
+        #     self.energy_max -= 0.5
+        #     self.energy_min += .1
+
         # if diff_val > self.energy_max:
         #     self.energy_max = diff_val
         # elif diff_val < self.energy_min:
         #     self.energy_min = diff_val
         # if diff_val > 0:
-        #     result = diff_val * 1.0 / self.energy_max
+        #     result = ( (diff_val - self.energy_min) * 1.0 ) / ( self.energy_max - self.energy_min)
         # else:
         #     result = diff_val * 1.0 / abs(self.energy_max)
 
-        result = ene1 * 1.0 / ene2
-        self.energyList.append(result)
-        result = np.mean(self.energyList.__data__)
+        #result = ene1 * 1.0 / ene2
+        # self.energyList.append(result)
+        #print self.diffVal.__data__
+        try:
+            self.diffVal.append(diff_val)
+            m = np.mean(self.diffVal.__data__)
+            result = diff_val - m
+            if result < m:
+                return -.5
+            else:
+                return .5
+            # result = result / np.std(self.diffVal.__data__)
+            # result = result / 2
+        except Exception as e:
+            result = -100
 
-        print "ene 1 : ", ene1, " ene2 : ", ene2, " max : ", self.energy_max, " idx: ", self.idx, self.energy_min, self.energy_max
+        #result = np.mean(self.energyList.__data__)
+
+        print "ene 1 : ", ene1, " ene2 : ", ene2, " max : ", self.energy_max, " idx: ", self.idx, " result : ", result
         return result
 
     def server(self):
@@ -279,7 +303,8 @@ class GrungerMonet:
                 elif num_client == 2:
                     strToSave = ""
                     for i in range(2):
-                        data[i] = connection_list[i + 1].recv(self.CHUNK)
+                        # data[i] = connection_list[i + 1].recv(self.CHUNK)
+                        data[i] = connection_list[i+1].recv(100)
                         if data[i]:
                             data[i] = np.fromstring(data[i])
                             try:
@@ -306,7 +331,7 @@ class GrungerMonet:
                         print strToSave
 
                     self.isVoice = False
-                    file = open("locationTest/data/dataForSound.data", "w+")
+                    file = open("data/dataForSound.data", "w+")
                     file.write(strToSave)
                     file.close()
             except KeyboardInterrupt:
@@ -328,22 +353,39 @@ class GrungerMonet:
         energyFile = open("data/energyMic1Result.data", "r")
         energyAnal = energyFile.readline().split(" ")
         energyAnal = map(float, energyAnal) ## [0]: mean ## [1]: std
+        self.originalThresholdVal = energyAnal[0]
         energyFile.close()
-
         try:
             clientSock.connect(ADDR)
             print("wait...")
             clientSock.recv(22)
             print("Recording....")
-            for i in range(0, n):
+            while True: #for i in range(0, n):
                 data = stream.read(self.CHUNK)
                 data = np.fromstring(data, dtype='int16')
                 fft_data1 = np.fft.fft(data)
                 fft_data1 = abs(fft_data1) / (len(fft_data1)/2)
                 energy = np.sum(fft_data1)
+                threshold = energyAnal[0] + energyAnal[1]*1.0
+                # if energy > energyAnal[0] + energyAnal[1]*2.5:
+                #     self.threshold.append(energy)
+                m = np.mean(self.threshold.__data__)
+                sq = math.sqrt(np.var(self.threshold.__data__))
+                if self.threshold.size() > 100:
+                    energyAnal[0] = m#np.mean(self.threshold.__data__)
+                    energyAnal[1] = sq
 
-                if energyAnal[0] + energyAnal[1]*2.0 < energy:
-                    print energy
+                print "mean: ", m, " sqrt : ",  sq
+                #
+                # if self.originalThresholdVal < energyAnal[0]:
+                #     if energy < energyAnal[0] + energyAnal[1]*2.5:
+                #         self.threshold.append(energy)
+                # else:
+                #     if energy < energyAnal[0] + energyAnal[1]*1.5:
+                #         self.threshold.append(energy)
+                self.threshold.append(energy)
+
+                if threshold < energy:  ## energy over the threshold
                     energy = self.normalize(energy, energyAnal[0], energyAnal[1])
                     feature = self.getFeature(fft_data1, data.size)
                     feature = np.append(feature, energy)
@@ -356,4 +398,3 @@ class GrungerMonet:
             print(e.message)
             sys.exit()
         print("connect")
-

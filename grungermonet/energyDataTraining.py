@@ -3,6 +3,7 @@ from pyAudioAnalysis import audioFeatureExtraction as af
 import sys
 import numpy as np
 from math import *
+import time
 
 
 def normalize(data, mean, std):
@@ -28,14 +29,13 @@ def analTheTrainingFile():
     f.close()
 
 
-
-
 if __name__ == "__main__":
     CHUNK = 2048
     MIC_NUM = 2
     RATE = 44100
     FORMAT = pyaudio.paInt16
-    RECORD_SECONDS = 300
+    RECORD_SECONDS = 100
+    t = time.time()
 
     sum_energy = 0
     idx = 0
@@ -49,6 +49,7 @@ if __name__ == "__main__":
     # t = map(float, t)
     # file.close()
 
+    # while True:
     file = open("data/energyDataForTrainingMic1.data", "w+")
 
     for i in range(0, n):
@@ -66,6 +67,9 @@ if __name__ == "__main__":
             # print "sum  ==============================", normalize(sum, t[0], t[1])
         print(sum)
         file.write(str(sum) + " ")
+
     file.close()
+
+    analTheTrainingFile()
 
 

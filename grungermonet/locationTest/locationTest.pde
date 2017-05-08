@@ -1,151 +1,6 @@
-////// import libraries
-////import SimpleOpenNI.*; // kinect
-////import blobDetection.*; // blobs
-//
-//// this is a regular java import so we can use and extend the polygon class (see PolygonBlob)
-//import java.awt.Polygon;
-//import java.util.Collections;
-//
-//int widthSize = 640;
-//int heightSize = 480;
-//float x;
-//float featureData[][] = new float[2][4];
-//color detectionColor = color(255);
-//
-//void setup() {
-//  size(widthSize, heightSize);
-//  x = width/2;
-//  fill(255);
-//  for (int i=0; i<2; i++)  
-//    for (int j=0; j<4; j++)
-//      featureData[i][j] = 0;
-//}
-//
-//void draw() {
-//  background(0, 30);
-//  ellipse(x, height/2, 40, 40);
-//  x = readFile();
-//  print("location : ", x);
-//  x = map(x, -1, 1, 0, width);
-//  println(" " + x);
-//  fill(detectionColor);
-//  if (x > width/2 )  detectionColor = setColor(x, 0);
-//  else  detectionColor = setColor(x, width);
-//  println();
-//  println();
-//}
-
-
-//color setColor(float x1, float x2) {
-//  float herz1, herz2;
-//  float herz[2];
-//
-//  if (x > width/2) {
-//    herz[0] = featureData[0][1];
-//    herz[1] = featureData[1][1];
-//  } else {
-//    herz[0] = featureData[1][1];
-//    herz[1] = featureData[0][1];
-//  }
-//  print(herz[0], herz[1]);
-//
-//  color[] palette = {
-//    color(204, 142, 193), color(47, 45, 92), color(76, 129, 255), color(42, 144, 54), 
-//    color(253, 255, 84), color(255, 126, 50), color(256, 41, 0)
-//  };
-//  int lowBound = 50;
-//  int highBound = 330;
-//  int idx[2];
-//  int r[3], g[3], b[3];
-//  float ration;
-//
-//  for (int i=0; i<2; i++) {
-//    herz[i] -= lowBound;
-//    idx[i] = int(herz[i] / ((highBound - lowBound) / 7 ) );
-//    r[i] = g[i] = b[i] = 0;
-//
-//    try {
-//      r[i] = int( map(herz[i], width/6 *idx[i], width/6*(idx[i]+1), red(palette[idx[i]]), red(palette[idx[i]+1])));
-//      g[i] = int( map(herz[i], width/6 *idx[i], width/6*(idx[i]+1), red(palette[idx[i]]), red(palette[idx[i]+1])));
-//      b[i] = int( map(herz[i], width/6 *idx[i], width/6*(idx[i]+1), red(palette[idx[i]]), red(palette[idx[i]+1])));
-//    }
-//    catch(Exception e) {
-//      if (idx[i] >= 6) {
-//        r[i] = 256;
-//        g[i] = 41;
-//        b[i] = 0;
-//      }
-//    }
-//  }
-//  if ( x1 > x2 )
-//    ratio = (x1 - x2) / x1;
-//  else
-//    ratio = (x2 - x1) / (width - x1);
-//
-//  r[2] =int( map(ratio, 0, 1, r[0], r[1]));
-//  g[2] =int( map(ratio, 0, 1, g[0], g[1]));
-//  b[2] =int( map(ratio, 0, 1, b[0], b[1]));
-//
-//  println(ratio, r[0], g[0], b[0], r[1], g[1], b[1], r[2], g[2], b[2]);
-//
-//  return color(r[2], g[2], b[2]);
-//}
-//
-//float readFile() {
-//  BufferedReader reader;
-//  String line;
-//  String splitData [];
-//  //  float size = 8;
-//  //  float sum_size = 0;
-//  //  int idx = 1;
-//  boolean isVoice = false;
-//  float xCoord = -1;
-//
-//  try {
-//    reader = createReader("data/dataForSound.data");
-//    line = reader.readLine();
-//    if (line == null) {
-//    } else {
-//      splitData = split(line, " ");
-//      for (int i=0; i<8; i++) {
-//        try {
-//          featureData[i/4][i%4] = float(splitData[i]);          
-//          //  print(featureData[i/4][i%4]+ " ");
-//        }
-//        catch (Exception e) {
-//          continue;
-//        }
-//        if (Double.isNaN(featureData[i/4][i%4])) {
-//          break;
-//        }
-//        if (featureData[0][0] == float(-1))
-//          isVoice = false;
-//        else 
-//          isVoice = true;
-//      }
-//      xCoord = float(splitData[splitData.length-1]);
-//      // xCoord -> mapping!!
-//      reader.close();
-//    }
-//  }
-//  catch(IOException e) {
-//    e.printStackTrace();
-//    line = null;
-//  }
-//  catch(NullPointerException e) {
-//    e.printStackTrace();
-//  }
-//  return xCoord;
-//}
-//
-//
-//
-//
-//
-//
-//
-//
-//
+////
+////
+////
 //
 
 //BlobKinnect Created by Chloe 2014
@@ -198,17 +53,17 @@ PVector position = new PVector(0, 0);
  Seoncheol
  ***********/
 // location variable
-
 float soundX;
 float featureData[][] = new float[2][4];
 color detectionColor = color(255);
 
-
-
-
 void setup() {
   // it's possible to customize this, for example 1920x1080
   size(640, 480, P2D);
+
+  waterfallMin = width/2.4;
+  waterfallMax = width-width/2.4;  
+
   s = new System();
   // initialize SimpleOpenNI object
   context = new SimpleOpenNI(this);
@@ -288,6 +143,44 @@ void draw() {
     //poly.createPolygon();
     soundX = readFile();
   }
+
+  //float spawnCount = 1;
+  colorMode(HSB, 360);
+
+  // Spawn new particles.
+  for (int num = 0; num < 1; num++) {
+    float x = random(waterfallMin, waterfallMax);
+    float mass = random(pMinMass, pMaxMass);
+    color displayColor;
+
+    if (particles.size() % 5 == 0) {
+      displayColor = color(255);
+    } else {
+      displayColor = color(random(180, 210), 255, 255);
+    }
+    Rainy newRainy = new Rainy(x, 0, mass, displayColor);
+    //
+  }
+
+  colorMode(RGB, 255);
+  for (int i = particles.size ()-1; i > -1; i--) {
+    particles.get(i).move();
+    boolean has_collision = particles.get(i).resolveCollisions();  
+    particles.get(i).display();
+    if (particles.get(i).pos.y > height) {
+      // Delete if it's out of bounds.
+      //particles.splice(i, 1);
+      particles.remove(i);
+    } else if (has_collision && particles.get(i).vel.mag() < 0.1) {
+      // Delete if it's stuck on top of a collision object.
+      //particles.splice(i, 1);
+      particles.remove(i);
+    }
+  }
+  for (int i = 0; i < collisions.size (); i++) {
+    collisions.get(i).move();
+    collisions.get(i).display();
+  }
 }
 
 
@@ -297,12 +190,13 @@ void onNewUser(int userId) {
 void onLostUser(int userId) {
   println("lost: " + userId);
 }
+
 void drawBlobsAndEdges(boolean drawEdges) {
   noFill();
   Blob b;
   color c;
   EdgeVertex eA, eB;
-  // print("???");
+  //// print("???");
 
   for (int n = 0; n < theBlobDetection.getBlobNb (); n++) {
     b = theBlobDetection.getBlob(n);
@@ -343,13 +237,11 @@ void drawBlobsAndEdges(boolean drawEdges) {
             println(" ratio : ", alp, " sumX : ", sum.x, "  sound X : ", soundX, "  alp : ", alp, n);
           println();
           c = setColor(sum.x, (int)alp);
-
           s.setColor(c);
-          if (s != null)
-          {
+          if (s != null)    
             while (!s.isDead ())
               s.run();
-          }
+
           strokeWeight(100);
           point(sum.x, sum.y);
           stroke(255, 0, 0);
@@ -360,126 +252,10 @@ void drawBlobsAndEdges(boolean drawEdges) {
   }
 }
 
-class System {
-  ArrayList<ParticleSystem> system;
-  int lifeSpan = 50;
-  color c;
-  System() {
-    system = new ArrayList<ParticleSystem>();
-  }
-  void add(PVector position) {
-    ParticleSystem ps = new ParticleSystem(position);
-    system.add(ps);
-  }
-  void setColor(color c) {
-    this.c = c;
-  }
-  void run() {
-    for (ParticleSystem ps : system) {
-      ps.setColor(c);
-      ps.addParticle();
-    }
-    lifeSpan -= 2; //
-    for (int i = system.size ()-1; i >= 0; i--) {
-      ParticleSystem ps = system.get(i);
-
-      ps.run();
-      if (ps.isDead()) {
-        system.remove(i);
-      }
-    }
-
-    //    sum.div(count);
-    //    println(sum);
-    //    stroke(255, 0, 0);
-    //    strokeWeight(10);
-    //    
-    //    point(sum.x, sum.y);
-  }
-  boolean isDead() {//
-    return (lifeSpan < 0.0);
-  }
-}
-class ParticleSystem {
-  ArrayList<Particle> particles;
-  PVector origin;
-  color c;
-  int lifeSpan = 20;
-  ParticleSystem(PVector position) {
-    origin = new PVector(position.x, position.y);
-    particles = new ArrayList<Particle>();
-  }
-  void setColor(color c)
-  {
-    this.c = c;
-  }
-  void addParticle() {
-    particles.add(new Particle(origin, c));
-  }
-
-  void run() {
-    lifeSpan -= 4;
-    for (int i = particles.size ()-1; i >= 0; i--) {
-      Particle p = particles.get(i);
-      p.run();
-      if (p.isDead()) {
-        particles.remove(i);
-      }
-    }
-  }
-  boolean isDead() {
-    return (lifeSpan < 0.0);
-  }
-}
-
-
-// A simple Particle class
-
-class Particle {
-  PVector position;
-  PVector velocity;
-  PVector acceleration;
-  color c;
-  float lifespan;
-
-  Particle(PVector l, color c) {
-    acceleration = new PVector(0, 2);
-    velocity = new PVector(random(-5, 5), random(-5, 5));
-    position = new PVector(l.x, l.y, 0);
-    this.c = c;
-    lifespan = 255.0;
-  }
-
-  void run() {
-    update();
-    display();
-  }
-
-  // Method to update position
-  void update() {
-    velocity.add(acceleration);
-    position.add(velocity);
-    lifespan -= 25.0;
-  }
-  // Method to display
-  void display() {
-    stroke(c, lifespan);
-    fill(c, lifespan);
-    ellipse(position.x, position.y, 4, 4);
-  }
-
-  // Is the particle still useful?
-  boolean isDead() {
-    if (lifespan < 0.0) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-}
 void onVisibleUser(SimpleOpenNI curContext, int userId) {
   // println("onVisibleUser - userId: " + userId);
 }
+
 /** Seoncheol **/
 /*
  *
@@ -488,6 +264,7 @@ void onVisibleUser(SimpleOpenNI curContext, int userId) {
  *
  **
  */
+
 color setColor(float manX, int alp) {
   float herz[] = new float[2];
   if (x > width/2) {
@@ -589,6 +366,7 @@ float readFile() {
       reader.close();
     }
   }
+
   catch(IOException e) {
     e.printStackTrace();
     line = null;
