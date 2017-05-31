@@ -2,6 +2,8 @@ float soundX;
 float featureData[][] = new float[2][4];
 color detectionColor = color(255);
 boolean isVoice;
+
+float volume = 1.0f;
 //int isVoice;
 
 
@@ -51,6 +53,9 @@ float readFile() {
   //  float size = 8;
   //  float sum_size = 0;
   //  int idx = 1;
+  for (int i=0; i<2; i++)  
+    for (int j=0; j<4; j++)  
+      featureData[i][j] = 1.0f;
 
   float xCoord = -1;
   try {
@@ -63,8 +68,10 @@ float readFile() {
       int i=1;
       featureData[0][0] = float(splitData[0]);
       j++;
-      if (featureData[0][0] == float(-1))  
+      if (featureData[0][0] == float(-1)) {
+        // volume value manipulate
         i=4;
+      }
       for (; i<8; i++) {
         try {
           featureData[i/4][i%4] = float(splitData[j++]);
@@ -75,17 +82,27 @@ float readFile() {
         if (Double.isNaN(featureData[i/4][i%4])) {
           break;
         }
-        if (featureData[0][0] == float(-1)) {
-          //isVoice = false;
-          //isVoice = 0;
-        } else 
-          isVoice = true;
         //isVoice = 100;
       }
-      xCoord = float(splitData[splitData.length-1]);
-      // xCoord -> mapping!!
-      reader.close();
+
+      if (!(featureData[0][0] == -1 && featureData[1][0] == -1)) {
+        float meanVolume = featureData[0][3] + featureData[1][3];
+        meanVolume /= 2.0f;
+        volume += meanVolume;
+        volume /= 2.0f;
+        volume += .6;
+        volume %= 10;
+        isVoice = true;
+        xCoord = float(splitData[splitData.length-1]);
+        // xCoord -> mapping!!
+      } else {
+        volume -= .1f;
+        if (volume <= 1)  volume = 1.0f;
+        isVoice = false;
+      }
     }
+
+    reader.close();
   }
   catch(IOException e) {
     e.printStackTrace();
@@ -100,8 +117,6 @@ float readFile() {
   //println("xcord : ", xCoord);
   fill(0);
   stroke(0);
-
-  //
   return xCoord;
 }
 
@@ -118,6 +133,7 @@ int setColorFunc(float manX, int alp) {
     herz[0] = featureData[1][1];
     herz[1] = featureData[0][1];
   }
+
   if (alp > 255)  alp = 255;
   else if (alp < 0) alp = 0;
   //  color[] palette = {
@@ -125,7 +141,7 @@ int setColorFunc(float manX, int alp) {
   //    color(253, 255, 84), color(255, 126, 50), color(256, 41, 0)
   //  };
   int lowBound = 60;
-  int highBound = 360;
+  int highBound = 300;
   int idx[] = new int[2];
   int r[], g[], b[];
   int len;
@@ -135,21 +151,105 @@ int setColorFunc(float manX, int alp) {
   g = new int[3];
   b = new int[3];
 
+  for (int i=0; i<2; i++) {
+    if (Double.isNaN(herz[i]))
+      herz[i] = lowBound;
+  }
+
   len = highBound - lowBound;
   len /= 6;
 
   ratio = abs(herz[0] - herz[1]);
   ratio /= width;
+  println("ra : ", ratio);
 
   for (int i=0; i<2; i++) {
     herz[i] -= lowBound;
-    idx[i] = int(herz[i] / (len / 6));
+    idx[i] = int(herz[i] / len);
+    println("idx : ", idx[i], manX);
   }
 
   resultIdx = (int)( idx[0] * ratio + idx[1] * (1-ratio) );
   if (resultIdx >= 6)      resultIdx = 6;
   else if (resultIdx < 0 ) resultIdx = 0;
+  println("herz : ", herz[0], herz[1], resultIdx);
+
   return resultIdx;
+}
+
+
+color[] setColorFunc(float manX) {
+  float herz[] = new float[2];
+  float ratio;
+  color returnCol[] = new color[3];
+  if (soundX > width/2) {
+    herz[0] = featureData[0][1];
+    herz[1] = featureData[1][1];
+  } else {
+    herz[0] = featureData[1][1];
+    herz[1] = featureData[0][1];
+  }
+  //  color[] palette = {
+  //    color(204, 142, 193), color(47, 45, 92), color(76, 129, 255), color(42, 144, 54), 
+  //    color(253, 255, 84), color(255, 126, 50), color(256, 41, 0)
+  //  };
+  int lowBound = 60;
+  int highBound = 300;
+  int idx[] = new int[2];
+  int r[], g[], b[];
+  int len;
+  int resultIdx= 0;
+  color resultColor[] = new color[3];
+
+  r = new int[3];
+  g = new int[3];
+  b = new int[3];
+  for (int i=0; i<2; i++) {
+    if (Double.isNaN(herz[i]))
+      herz[i] = lowBound;
+  }
+
+  len = highBound - lowBound;
+  len /= 6;
+
+  ratio = abs(herz[0] - herz[1]);
+  ratio /= width;
+  println("herz: ", herz[0], herz[1], len);
+  for (int i=0; i<2; i++) {
+    herz[i] -= lowBound;
+    idx[i] = int(herz[i] / len) % 7;
+  }
+  resultIdx = (int)( idx[0] * ratio + idx[1] * (1-ratio) );
+  if (resultIdx >= 6)      resultIdx = 6;
+  else if (resultIdx < 0 ) resultIdx = 0;
+
+  color c[][] = new color[2][3];
+
+  switch(state) {
+  case 0:
+
+    for (int j=0; j<2; j++)
+      for (int i=0; i<3; i++)  
+        c[j][i] = color(red(paletteOrigin[i][(idx[j])]), green(paletteOrigin[i][(idx[j])]), blue(paletteOrigin[i][(idx[j])%7]));
+    break;
+  case 1:
+  case 2:
+    for (int j=0; j<2; j++) {
+      for (int i=0; i<2; i++)    
+        c[j][i] = color(red(linePalette[i][(idx[j])]), green(linePalette[i][(idx[j])]), blue(linePalette[i][(idx[j])%7]));
+      c[j][2] = color(0, 0, 0);
+    }
+  }
+  for (int i=0; i<3; i++) {  
+    resultColor[i] = lerpColor(c[0][i], c[1][i], (manX)/ (3*kinectWidth/4));
+  }
+  for (int i=0; i<2; i++) {
+    println( "i : ", i, red(c[i][0]), green(c[i][0]), blue(c[i][0]));
+  }
+  println("x : ", (manX)/ (3*kinectWidth/4), red(resultColor[0]), green(resultColor[0]), blue(resultColor[0]));
+
+
+  return resultColor;
 }
 //
 //  for (int i=0; i<2; i++) {
@@ -184,4 +284,16 @@ int setColorFunc(float manX, int alp) {
 //
 //return returnCol;
 //}
+
+
+void keyPressed() {
+
+  if (keyCode == UP) {
+    volume += .6;
+    volume %= 10;
+  } else if (keyCode == DOWN) {
+    volume -= .6;
+    volume %= 10;
+  }
+}
 

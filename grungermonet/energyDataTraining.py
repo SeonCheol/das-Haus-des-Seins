@@ -14,7 +14,7 @@ def normalize(data, mean, std):
 
 
 def analTheTrainingFile():
-    file = open("data/energyDataForTrainingMic1.data", "r")
+    file = open("data/energyDataForTrainingMic.data", "r")
     stream = file.readlines()
     datas = stream[0].split(" ")
     datas = datas[:-1]
@@ -24,7 +24,7 @@ def analTheTrainingFile():
     std = sqrt(np.var(datas))
 
     file.close()
-    f = open("data/energyMic1Result.data", "w+")
+    f = open("data/energyMicResult.data", "w+")
     f.write(str(mean) + " " + str(std))
     f.close()
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # file.close()
 
     # while True:
-    file = open("data/energyDataForTrainingMic1.data", "w+")
+    file = open("data/energyDataForTrainingMic.data", "w+")
 
     for i in range(0, n):
         # if (idx % 10 == 0):

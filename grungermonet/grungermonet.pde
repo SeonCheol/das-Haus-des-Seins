@@ -32,9 +32,10 @@ PVector sum = new PVector(0, 0);
 float count;
 //ParticleSystem ps;
 HashMap<Integer, System> userSystem;
-System defaultSystem;
 int userCount;
 PVector position = new PVector(0, 0);
+
+System defaultSystem;
 
 void setup() {
   // it's possible to customize this, for example 1920x1080
@@ -45,7 +46,7 @@ void setup() {
     System s = new System();
     userSystem.put(i, s);
   }
-  defaultSystem = new System();
+
   // initialize SimpleOpenNI object
   context = new SimpleOpenNI(this);
   if (!context.isInit()) {
@@ -71,13 +72,15 @@ void setup() {
     //user start
     theBlobDetection.setPosDiscrimination(true);
     //user end
-    theBlobDetection.setThreshold(0.2);
+    theBlobDetection.setThreshold(0.1);
     isVoice = false;
     //isVoice = 0;
   }
 
 
   curTime = second();
+
+  defaultSystem = new System();
 }
 
 void draw() {
@@ -118,6 +121,8 @@ void draw() {
   fill(255, 0, 0);  
   //println("sound ::: ", soundX, width, kinectWidth, kinectHeight, mouseX, "-----------------------------------");
   //ellipse(soundX/2, kinectHeight/2, 50, 50);
+
+  drawDefault(defaultSystem);
 }
 
 void onNewUser(int userId) {

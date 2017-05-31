@@ -34,14 +34,14 @@ void drawBlobsAndEdges() {
 
       if (b != null) {
         // println( b.getEdgeNb ());
-        if (b.getEdgeNb() > 100 && userCount < userSystem.size()) {
+        if (b.getEdgeNb() > 200 && userCount < userSystem.size()) {
           s = userSystem.get(userCount);
           int t = second() - curTime;
           if (t < 0) t+= 60;
           t = timeDelay - t;
-          if (b.getEdgeNb() > 500 && t < 0 ) {
-            println(t, "second flow ~!!!!");
-            runParticle = !runParticle;
+          if (b.getEdgeNb() > 400 && t < 0 ) {
+            //println(t, "second flow ~!!!!");
+            //    runParticle = !runParticle;
             curTime = second();
           }
           //else runParticle = false;
@@ -54,25 +54,42 @@ void drawBlobsAndEdges() {
               y = eA.y * height;
               xB = eB.x * width;
               yB = eB.y * height;
-              if (runParticle && m%2==0) {
-                frameRate(60);
-                position.set(x, y, 0);
-                s.addParticlePosition(position);
-                sum.add(position);
-                count++;
-              } else {
-                frameRate(15);
-                positionA.set(x, y, 0);
-                positionB.set(xB, yB, 0);
-                s.addEnergyPosition(positionA, positionB);
-                sum.add(positionA);
-                count++;
+              switch(state) {
+              case 0:  
+                {
+                  if (m%2 == 0) {
+                    frameRate(60);
+                    position.set(x, y, 0);
+                    s.addParticlePosition(position);
+                    sum.add(position);
+                    count++;
+                  }
+                  break;
+                }
+              case 1:  
+                {
+                  frameRate(15);
+                  positionA.set(x, y, 0);
+                  positionB.set(xB, yB, 0);
+                  s.addEnergyPosition(positionA, positionB);
+                  sum.add(positionA);
+                  count++;
+                  break;
+                }
+              case 2:  
+                {
+                  frameRate(60);
+                  position.set(x, y, 0);
+                  s.addFacePosition(position);
+                  sum.add(position);
+                  count++;
+                }
+                //stroke(0, 30);
+                //line(x, y, xB, yB);
+                //println("print", x, y);
+                //  s.add(position);
+                //strokeWeight(1);
               }
-              //stroke(0, 30);
-              //line(x, y, xB, yB);
-              //println("print", x, y);
-              //  s.add(position);
-              //strokeWeight(1);
             }
           }
           //println(userCount, sum); 
@@ -81,29 +98,29 @@ void drawBlobsAndEdges() {
           //float alp =
           fill(255, 0, 0);
           size =abs( 1 - ( abs(sum.x - soundX/3) / (float)width));
-          int idx = setColorFunc(sum.x, (int)size*255);
-          while ( palette[idx] == color (0)) {
-            idx++;
-            idx %= 7;
-          }
-          color c[] = new color[3];
-          if (runParticle) {
-            c[0] = color(red(paletteOrigin[0][(idx +2) %7]), green(paletteOrigin[0][(idx +2) %7]), blue(paletteOrigin[0][(idx +2) %7]), (int)(size*255)); 
-            c[1] = color(red(paletteOrigin[1][(idx +2) %7]), green(paletteOrigin[1][(idx +2) %7]), blue(paletteOrigin[1][(idx +2) %7]), (int)(size*255)); 
-            c[2] = color(red(paletteOrigin[2][(idx +2) %7]), green(paletteOrigin[2][(idx +2) %7]), blue(paletteOrigin[2][(idx +2) %7]), (int)(size*255));
-            //            color(red(paletteOrigin[0][idx%2 +userCount*2]), green(paletteOrigin[0][idx%2 +userCount*2]), blue(paletteOrigin[0][idx%2 +userCount*2]), (int)(size*255)), 
-            //            color(red(paletteOrigin[1][idx%2 +userCount*2]), green(paletteOrigin[1][idx%2 +userCount*2]), blue(paletteOrigin[1][idx%2 +userCount*2]), (int)(size*255)), 
-            //            color(red(paletteOrigin[2][idx%2 +userCount*2]), green(paletteOrigin[2][idx%2 +userCount*2]), blue(paletteOrigin[2][idx%2 +userCount*2]), (int)(size*255))
-            //setColorFunc(sum.x, (int)size *255);
-          } else {
-            c[0] =  color(red(linePalette[0][(idx ) %7]), green(linePalette[0][(idx ) %7]), blue(linePalette[0][(idx ) %7]), (int)(size*255));
-            c[1] =color(red(linePalette[1][(idx ) %7]), green(linePalette[1][(idx ) %7]), blue(linePalette[1][(idx ) %7]), (int)(size*255));
-            c[2] = color(red(paletteOrigin[2][(idx ) %7]), green(paletteOrigin[2][(idx ) %7]), blue(paletteOrigin[2][(idx ) %7]), (int)(size*255));
-          }
-
-
-          palette[idx] = color(0);
-          //  s.setSize(size*4);
+          //int idx = setColorFunc(sum.x, (int)size*255);
+          //          while ( palette[idx] == color (0)) {
+          //            idx++;
+          //            idx %= 7;
+          //          }
+          
+          color c[] = setColorFunc(sum.x);
+          //          if (runParticle) {
+          //            for (int i=0; i<3; i++)  
+          //              c[i] = color(red(paletteOrigin[i][(idx)%7]), green(paletteOrigin[i][(idx)%7]), blue(paletteOrigin[i][(idx)%7]));
+          //            //            c[0] = color(red(paletteOrigin[0][(idx%4 +userCount*2)%7]), green(paletteOrigin[0][(idx%4 +userCount*2)%7]), blue(paletteOrigin[0][(idx%4 +userCount*2)%7])); 
+          //            //            c[1] = color(red(paletteOrigin[1][(idx%4 +userCount*2)%7]), green(paletteOrigin[1][(idx%4 +userCount*2)%7]), blue(paletteOrigin[1][(idx%4 +userCount*2)%7])); 
+          //            //            c[2] = color(red(paletteOrigin[2][(idx%4 +userCount*2)%7]), green(paletteOrigin[2][(idx%4 +userCount*2)%7]), blue(paletteOrigin[2][(idx%4 +userCount*2)%7]));
+          //            //setColorFunc(sum.x, (int)size *255);
+          //          } else {
+          //            for (int i=0; i<3; i++)  
+          //              c[i] = color(red(paletteOrigin[i][(idx)%7]), green(paletteOrigin[i][(idx)%7]), blue(paletteOrigin[i][(idx)%7]));
+          //            //            c[0] = color(red(linePalette[0][(idx%4 + userCount*2 ) %7]), green(linePalette[0][(idx%4 + userCount*2 ) %7]), blue(linePalette[0][(idx%4 +userCount*2 ) %7]), (int)(size*255));
+          //            //            c[1] = color(red(linePalette[1][(idx%4 + userCount*2 ) %7]), green(linePalette[1][(idx%4 + userCount*2 ) %7]), blue(linePalette[1][(idx%4 +userCount*2 ) %7]), (int)(size*255));
+          //            //            c[2] = color(red(paletteOrigin[2][(idx%4 +userCount*2 ) %7]), green(paletteOrigin[2][(idx%4 +userCount*2 ) %7]), blue(paletteOrigin[2][(idx%4 +userCount*2 ) %7]), (int)(size*255));
+          //          }
+          // palette[idx] = color(0);
+          //          s.setSize(volume*4);
           try {
             diffVal[userCount] = (int)abs(sum.x-soundX/3);
             pal[userCount++] = c;
@@ -128,23 +145,19 @@ void drawBlobsAndEdges() {
       }
       //println("????");
       userCount=0;
-      println("sorting ");
-      for (int i=0; i<3; i++) {
-        println("diffval : ", diffVal[i], "  sorting: ", sorting[i], " i : ", i);
-      }
-
+      int min = 3;
       for (int i=0; i<3; i++) {
         if (diffVal[i] == -1)  break;
+        if (sorting[i] < min) {
+          min = sorting[i];
+        }
         s = userSystem.get(i);
         s.setColor(pal[sorting[i]]);
-        s.setSize(2);
+        s.setSize(volume);
         s.setDir(sorting[i]);
         s.run();
         userCount++;
       }
-
-
-      // println("?????");
     }
     for (int i=0; i<7; i++)
       palette[i] = paletteOrigin[0][i];
@@ -156,7 +169,6 @@ void drawBlobsAndEdges() {
   }
 }
 
-
 void drawDefault(int i) {
   System s;
   for (i=0; i<userSystem.size (); i++) {
@@ -164,7 +176,9 @@ void drawDefault(int i) {
     setDefault(s);
   }
 }
-
+void drawDefault(System s) {
+  setDefault(s);
+}
 void setDefault(System s) {
   if (s.isEmpty()) {
     for (int i=0; i<200; i++) {
